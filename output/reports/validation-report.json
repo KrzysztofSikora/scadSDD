@@ -1,0 +1,169 @@
+{
+  "status": "passed",
+  "spec_version": "1.0.0",
+  "model_id": "bracket-001",
+  "generated_at": "2026-07-29T09:44:14.152880+00:00",
+  "model": {
+    "solid_count": 1,
+    "is_valid": true,
+    "volume_mm3": 19568.672587712812,
+    "surface_area_mm2": 9515.876080051798,
+    "bounding_box_mm": {
+      "x": 100.0,
+      "y": 40.0,
+      "z": 5.0
+    },
+    "mass_kg": 0.05283541598682459
+  },
+  "features": {
+    "hole_count": 4,
+    "hole_diameter_mm": 5.0,
+    "hole_positions_mm": [
+      [
+        42.0,
+        12.0
+      ],
+      [
+        42.0,
+        -12.0
+      ],
+      [
+        -42.0,
+        12.0
+      ],
+      [
+        -42.0,
+        -12.0
+      ]
+    ]
+  },
+  "topology_cross_check": {
+    "note": "Best-effort topological cross-check, informational only \u2014 not authoritative. See specs/constraints.md.",
+    "cylindrical_faces_near_hole_radius": 4,
+    "matches_declared_hole_count": true
+  },
+  "checks": [
+    {
+      "id": "solid_count",
+      "description": "Model composed of exactly one solid.",
+      "expected": 1,
+      "actual": 1,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "geometry_valid",
+      "description": "Solid passes OCCT validity check (no empty/negative geometry).",
+      "expected": true,
+      "actual": true,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "bounding_box_length",
+      "description": "Bounding box X (length) matches specification.",
+      "expected": 100.0,
+      "actual": 100.0,
+      "tolerance": 0.05,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "bounding_box_width",
+      "description": "Bounding box Y (width) matches specification.",
+      "expected": 40.0,
+      "actual": 40.0,
+      "tolerance": 0.05,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "bounding_box_thickness",
+      "description": "Bounding box Z (thickness) matches specification.",
+      "expected": 5.0,
+      "actual": 5.0,
+      "tolerance": 0.05,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "volume_positive",
+      "description": "Solid has strictly positive volume.",
+      "expected": "> 0",
+      "actual": 19568.672587712812,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "hole_count",
+      "description": "Number of mounting holes matches specification (from build features).",
+      "expected": 4,
+      "actual": 4,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "hole_diameter",
+      "description": "Mounting hole diameter matches specification (from build features).",
+      "expected": 5.0,
+      "actual": 5.0,
+      "tolerance": 0.02,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "rebuild_succeeds",
+      "description": "Model can be rebuilt from the same parameters without error.",
+      "expected": "no exception",
+      "actual": "no exception",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "rebuild_deterministic",
+      "description": "Two independent builds produce identical measurements and features.",
+      "expected": "identical",
+      "actual": "identical",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "export_step_exists",
+      "description": "STEP export succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "export_stl_exists",
+      "description": "STL export succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    }
+  ],
+  "exports": {
+    "step": {
+      "status": "passed",
+      "path": "/home/krzysztof/projects/scadSDD/output/step/model.step"
+    },
+    "stl": {
+      "status": "passed",
+      "path": "/home/krzysztof/projects/scadSDD/output/stl/model.stl"
+    },
+    "preview": {
+      "status": "passed",
+      "path": "/home/krzysztof/projects/scadSDD/output/previews/model.png"
+    }
+  }
+}

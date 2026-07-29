@@ -1,0 +1,299 @@
+{
+  "status": "passed",
+  "spec_version": "1.0.0",
+  "model_id": "magnetic-rifle-mount-001",
+  "generated_at": "2026-07-29T09:45:18.372823+00:00",
+  "parts": {
+    "base": {
+      "model": {
+        "solid_count": 1,
+        "is_valid": true,
+        "volume_mm3": 30622.80921018483,
+        "surface_area_mm2": 16534.862686737444,
+        "bounding_box_mm": {
+          "x": 60.0,
+          "y": 60.0,
+          "z": 48.0000001
+        },
+        "mass_kg": 0.08268158486749905
+      },
+      "features": {
+        "magnet_count": 4,
+        "magnet_diameter_mm": 12.0,
+        "magnet_positions_mm": [
+          [
+            20.0,
+            20.0
+          ],
+          [
+            20.0,
+            -20.0
+          ],
+          [
+            -20.0,
+            20.0
+          ],
+          [
+            -20.0,
+            -20.0
+          ]
+        ],
+        "nut_boss_outer_diameter_mm": 33.0,
+        "thread": {
+          "pitch_mm": 4.0,
+          "major_diameter_mm": 25.0,
+          "angle_deg": 29.0,
+          "engagement_length_mm": 40.0
+        }
+      }
+    },
+    "arm": {
+      "model": {
+        "solid_count": 1,
+        "is_valid": true,
+        "volume_mm3": 74791.3503856568,
+        "surface_area_mm2": 24235.700019571053,
+        "bounding_box_mm": {
+          "x": 42.0,
+          "y": 40.0,
+          "z": 154.0000001
+        },
+        "mass_kg": 0.20193664604127334
+      },
+      "features": {
+        "rod_threaded_length_mm": 112.0,
+        "collar_diameter_mm": 27.0,
+        "u_internal_width_mm": 30.0,
+        "u_arm_length_mm": 40.0,
+        "thread": {
+          "pitch_mm": 4.0,
+          "major_diameter_mm": 25.0,
+          "angle_deg": 29.0,
+          "engagement_length_mm": 40.0
+        }
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "base_solid_count",
+      "description": "Cz\u0119\u015b\u0107 'base' sk\u0142ada si\u0119 z dok\u0142adnie jednej bry\u0142y.",
+      "expected": 1,
+      "actual": 1,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "base_geometry_valid",
+      "description": "Bry\u0142a 'base' przechodzi test poprawno\u015bci OCCT.",
+      "expected": true,
+      "actual": true,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "base_volume_positive",
+      "description": "Bry\u0142a 'base' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
+      "expected": "> 0",
+      "actual": 30622.80921018483,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "arm_solid_count",
+      "description": "Cz\u0119\u015b\u0107 'arm' sk\u0142ada si\u0119 z dok\u0142adnie jednej bry\u0142y.",
+      "expected": 1,
+      "actual": 1,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "arm_geometry_valid",
+      "description": "Bry\u0142a 'arm' przechodzi test poprawno\u015bci OCCT.",
+      "expected": true,
+      "actual": true,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "arm_volume_positive",
+      "description": "Bry\u0142a 'arm' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
+      "expected": "> 0",
+      "actual": 74791.3503856568,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "magnet_count",
+      "description": "Liczba magnes\u00f3w zgodna ze specyfikacj\u0105.",
+      "expected": 4,
+      "actual": 4,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "magnet_diameter",
+      "description": "\u015arednica magnes\u00f3w zgodna ze specyfikacj\u0105.",
+      "expected": 12.0,
+      "actual": 12.0,
+      "tolerance": 0.05,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "mounting_plate_size",
+      "description": "Wymiar p\u0142yty mocuj\u0105cej zgodny ze specyfikacj\u0105.",
+      "expected": 60.0,
+      "actual": 60.0,
+      "tolerance": 0.2,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "u_internal_width",
+      "description": "Prze\u015bwit chwytu C zgodny ze specyfikacj\u0105.",
+      "expected": 30.0,
+      "actual": 30.0,
+      "tolerance": 0.2,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "collar_diameter",
+      "description": "\u015arednica ko\u0142nierza oporowego zgodna ze specyfikacj\u0105.",
+      "expected": 27.0,
+      "actual": 27.0,
+      "tolerance": 0.1,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "rod_threaded_length",
+      "description": "D\u0142ugo\u015b\u0107 gwintowanej cz\u0119\u015bci trzpienia zgodna ze specyfikacj\u0105.",
+      "expected": 112.0,
+      "actual": 112.0,
+      "tolerance": 0.3,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "thread_compatibility",
+      "description": "Gwint wewn\u0119trzny (base) i zewn\u0119trzny (arm) maj\u0105 identyczne parametry.",
+      "expected": {
+        "pitch_mm": 4.0,
+        "major_diameter_mm": 25.0,
+        "angle_deg": 29.0,
+        "engagement_length_mm": 40.0
+      },
+      "actual": {
+        "pitch_mm": 4.0,
+        "major_diameter_mm": 25.0,
+        "angle_deg": 29.0,
+        "engagement_length_mm": 40.0
+      },
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "thread_engagement_at_max_extension",
+      "description": "Zaz\u0119bienie gwintu przy maksymalnym wysuni\u0119ciu (140mm) nie spada poni\u017cej thread_engagement_length.",
+      "expected": ">= 40.0",
+      "actual": 46.0,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "rebuild_succeeds",
+      "description": "Oba elementy daj\u0105 si\u0119 odbudowa\u0107 bez b\u0142\u0119du.",
+      "expected": "no exception",
+      "actual": "no exception",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "rebuild_deterministic",
+      "description": "Dwa niezale\u017cne budowania daj\u0105 identyczne pomiary i cechy dla obu cz\u0119\u015bci.",
+      "expected": "identical",
+      "actual": "identical",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "base_export_step_exists",
+      "description": "base export step exists succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "base_export_stl_exists",
+      "description": "base export stl exists succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "arm_export_step_exists",
+      "description": "arm export step exists succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "arm_export_stl_exists",
+      "description": "arm export stl exists succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    }
+  ],
+  "exports": {
+    "base": {
+      "step": {
+        "status": "passed",
+        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/step/base.step"
+      },
+      "stl": {
+        "status": "passed",
+        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/stl/base.stl"
+      },
+      "preview": {
+        "status": "passed",
+        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/previews/base.png"
+      }
+    },
+    "arm": {
+      "step": {
+        "status": "passed",
+        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/step/arm.step"
+      },
+      "stl": {
+        "status": "passed",
+        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/stl/arm.stl"
+      },
+      "preview": {
+        "status": "passed",
+        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/previews/arm.png"
+      }
+    }
+  }
+}

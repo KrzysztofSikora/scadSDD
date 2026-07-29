@@ -18,26 +18,13 @@ dist/
 *.swo
 .DS_Store
 
-# Generated CAD artifacts (keep directories via .gitkeep, ignore contents)
-output/step/*
-!output/step/.gitkeep
-output/stl/*
-!output/stl/.gitkeep
-output/previews/*
-!output/previews/.gitkeep
-output/reports/*
-!output/reports/.gitkeep
+# Generated CAD artifacts: STEP/STL/previews/reports ARE tracked (committed
+# on request, so the repo always has a browsable, up-to-date snapshot of
+# the built models). Only the per-run build logs are ignored (timestamped,
+# not meaningful to diff/version).
 output/logs/*
 !output/logs/.gitkeep
 
-output/rifle-mount/step/*
-!output/rifle-mount/step/.gitkeep
-output/rifle-mount/stl/*
-!output/rifle-mount/stl/.gitkeep
-output/rifle-mount/previews/*
-!output/rifle-mount/previews/.gitkeep
-output/rifle-mount/reports/*
-!output/rifle-mount/reports/.gitkeep
 output/rifle-mount/logs/*
 !output/rifle-mount/logs/.gitkeep
 
