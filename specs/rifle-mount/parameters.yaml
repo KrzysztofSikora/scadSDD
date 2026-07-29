@@ -1,0 +1,248 @@
+# Machine-readable parameter source for the "Magnetic Rifle Barrel Mount".
+#
+# THIS FILE IS THE AUTHORITATIVE SOURCE OF TRUTH FOR ALL NUMERIC VALUES.
+#
+# specs/rifle-mount/spec.md contains a human-readable parameter table that
+# must mirror this file exactly (fenced ```yaml block, checked by
+# tests/rifle_mount/test_spec_compliance.py with a real YAML parser, never
+# regex). src/cad_project/rifle_mount/parameters.py loads this file
+# directly at runtime.
+#
+# See specs/rifle-mount/decisions.md for how these values were derived
+# (thread engagement math, fixed-offset calculation for the 80-140mm range).
+
+project:
+  name: "Magnetic Rifle Barrel Mount"
+  model_id: "magnetic-rifle-mount-001"
+  spec_version: "1.0.0"
+  units: "mm"
+
+parameters:
+  - id: wall_to_barrel_center_min
+    name: "Minimalna odległość ścianka -> środek lufy"
+    value: 80.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Minimalna odległość od ścianki sejfu (powierzchni stykającej się z
+      magnesami) do środka lufy spoczywającej w chwycie U, przy
+      maksymalnie wkręconym mechanizmie regulacji.
+
+  - id: wall_to_barrel_center_max
+    name: "Maksymalna odległość ścianka -> środek lufy"
+    value: 140.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Maksymalna odległość od ścianki sejfu do środka lufy, przy
+      maksymalnie wykręconym (wysuniętym) mechanizmie regulacji.
+
+  - id: barrel_diameter_reference
+    name: "Referencyjna średnica lufy"
+    value: 20.0
+    unit: mm
+    tolerance: 0.5
+    description: >
+      Założona średnica lufy (bez osprzętu) używana wyłącznie do
+      wyznaczenia prześwitu w chwycie U i pozycji środka lufy. Nie jest
+      cechą wytwarzaną modelu.
+
+  - id: magnet_diameter
+    name: "Średnica magnesu neodymowego"
+    value: 12.0
+    unit: mm
+    tolerance: 0.05
+    description: Średnica każdego z czterech magnesów dyskowych.
+
+  - id: magnet_thickness
+    name: "Grubość magnesu neodymowego"
+    value: 3.0
+    unit: mm
+    tolerance: 0.05
+    description: Grubość (wysokość) każdego magnesu dyskowego.
+
+  - id: magnet_count
+    name: "Liczba magnesów"
+    value: 4
+    unit: count
+    tolerance: 0
+    description: Liczba magnesów neodymowych mocujących do ścianki sejfu.
+
+  - id: magnet_pocket_wall_thickness
+    name: "Grubość ścianki nad magnesem"
+    value: 1.0
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Grubość plastiku pozostająca między dnem kieszeni magnesu a
+      zewnętrzną (przyścienną) powierzchnią płyty mocującej.
+
+  - id: mounting_plate_size
+    name: "Wymiar płyty mocującej (kwadrat)"
+    value: 60.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Długość boku kwadratowej płyty mocującej z magnesami. Dobrana tak,
+      by kieszenie na magnesy w narożnikach nie kolidowały z tuleją
+      gwintowaną (nut_boss_outer_diameter) w środku płyty — patrz
+      specs/rifle-mount/decisions.md.
+
+  - id: mounting_plate_thickness
+    name: "Grubość płyty mocującej"
+    value: 4.0
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Całkowita grubość płyty mocującej (magnet_thickness +
+      magnet_pocket_wall_thickness) — spójność sprawdzana automatycznie.
+
+  - id: magnet_edge_offset
+    name: "Odsunięcie środka magnesu od krawędzi płyty"
+    value: 10.0
+    unit: mm
+    tolerance: 0.2
+    description: Odległość środka każdego magnesu od najbliższej krawędzi płyty.
+
+  - id: plate_corner_fillet_radius
+    name: "Promień zaokrąglenia narożników płyty"
+    value: 5.0
+    unit: mm
+    tolerance: 0.2
+    description: Zaokrąglenie czterech pionowych krawędzi narożników płyty mocującej.
+
+  - id: thread_pitch
+    name: "Skok gwintu"
+    value: 4.0
+    unit: mm
+    tolerance: 0.1
+    description: Skok grubego gwintu trapezowego łączącego obie części.
+
+  - id: thread_major_diameter
+    name: "Średnica zewnętrzna gwintu (trzpień)"
+    value: 25.0
+    unit: mm
+    tolerance: 0.1
+    description: Średnica zewnętrzna (major diameter) gwintowanego trzpienia.
+
+  - id: thread_angle_deg
+    name: "Kąt gwintu trapezowego"
+    value: 29.0
+    unit: deg
+    tolerance: 0
+    description: Kąt profilu gwintu trapezowego (standard ACME = 29°).
+
+  - id: thread_engagement_length
+    name: "Efektywna długość zazębienia gwintu"
+    value: 20.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Długość gwintu wewnętrznego w tulei — stałe zazębienie utrzymywane
+      w całym zakresie regulacji (patrz specs/rifle-mount/decisions.md).
+
+  - id: nut_wall_thickness
+    name: "Grubość ścianki tulei wokół gwintu"
+    value: 4.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Grubość materiału tulei między rdzeniem gwintu wewnętrznego a jej
+      zewnętrzną powierzchnią (tuleja OD = thread_major_diameter + 2x ta wartość).
+
+  - id: nut_boss_length
+    name: "Długość tulei gwintowanej"
+    value: 24.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Całkowita długość walcowej tulei na płycie mocującej (zazębienie
+      20mm + margines/wejście na gwint).
+
+  - id: rod_threaded_length
+    name: "Długość gwintowanej części trzpienia"
+    value: 108.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Długość gwintu na trzpieniu, licząc od jego końca wchodzącego w
+      tuleję — musi zapewniać pełne zazębienie (thread_engagement_length)
+      w całym zakresie regulacji (patrz decisions.md — obliczenie).
+
+  - id: collar_length
+    name: "Długość kołnierza oporowego"
+    value: 10.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Długość gładkiego kołnierza między gwintowanym trzpieniem a
+      chwytem U, ograniczającego maksymalne wkręcenie.
+
+  - id: collar_diameter
+    name: "Średnica kołnierza oporowego"
+    value: 27.0
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Średnica kołnierza — większa niż thread_major_diameter (żeby
+      opierał się o czoło tulei), mniejsza niż średnica zewnętrzna tulei.
+
+  - id: u_internal_width
+    name: "Prześwit wewnętrzny chwytu U"
+    value: 30.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Szerokość wewnętrzna (prześwit) chwytu U, w którą swobodnie wsuwa
+      się lufa.
+
+  - id: u_arm_length
+    name: "Długość chwytu U wzdłuż osi lufy"
+    value: 40.0
+    unit: mm
+    tolerance: 0.2
+    description: Długość (głębokość wzdłuż osi lufy) profilu U.
+
+  - id: u_arm_height
+    name: "Wysokość ramion chwytu U"
+    value: 26.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Wysokość wewnętrzna ramion U, licząc od dna (powierzchni podpierającej
+      lufę) do górnej krawędzi otwarcia. Wartość dobrana tak, by chwyt U
+      (wraz ze ścianką u_wall_thickness) był wyśrodkowany na osi trzpienia
+      gwintowanego — środek lufy referencyjnej wypada wtedy dokładnie na
+      osi gwintu (współosiowo). Poprawiono z 25.0mm po wykryciu, że chwyt
+      U był przesunięty względem osi trzpienia — patrz
+      specs/rifle-mount/decisions.md ("U cradle coaxial alignment fix").
+
+  - id: u_wall_thickness
+    name: "Grubość ścianek chwytu U"
+    value: 6.0
+    unit: mm
+    tolerance: 0.2
+    description: Grubość dna i ramion litery U.
+
+  - id: liner_groove_width
+    name: "Szerokość rowka na wkładkę filcową"
+    value: 2.0
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Szerokość rowka wzdłuż wewnętrznej powierzchni U na wklejaną
+      wkładkę ochronną (filc/guma).
+
+  - id: liner_groove_depth
+    name: "Głębokość rowka na wkładkę filcową"
+    value: 1.0
+    unit: mm
+    tolerance: 0.1
+    description: Głębokość rowka na wkładkę ochronną, wcięta w ścianki U.
+
+  - id: material_density
+    name: "Gęstość materiału (opcjonalna, do obliczenia masy)"
+    value: 1.24e-6
+    unit: kg/mm3
+    tolerance: 0
+    description: Domyślna gęstość materiału (PLA) używana wyłącznie do obliczenia masy.

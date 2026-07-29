@@ -1,0 +1,47 @@
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Generated CAD artifacts (keep directories via .gitkeep, ignore contents)
+output/step/*
+!output/step/.gitkeep
+output/stl/*
+!output/stl/.gitkeep
+output/previews/*
+!output/previews/.gitkeep
+output/reports/*
+!output/reports/.gitkeep
+output/logs/*
+!output/logs/.gitkeep
+
+output/rifle-mount/step/*
+!output/rifle-mount/step/.gitkeep
+output/rifle-mount/stl/*
+!output/rifle-mount/stl/.gitkeep
+output/rifle-mount/previews/*
+!output/rifle-mount/previews/.gitkeep
+output/rifle-mount/reports/*
+!output/rifle-mount/reports/.gitkeep
+output/rifle-mount/logs/*
+!output/rifle-mount/logs/.gitkeep
+
+# Local Claude Code settings (machine-specific permissions) and runtime state
+.claude/settings.local.json
+.claude/settings.local.json.tmp*
+.claude/scheduled_tasks.lock

@@ -1,0 +1,87 @@
+# Machine-readable parameter source for the "Mounting Bracket" CAD model.
+#
+# THIS FILE IS THE AUTHORITATIVE SOURCE OF TRUTH FOR ALL NUMERIC VALUES.
+#
+# specs/spec.md contains a human-readable parameter table that must mirror this
+# file exactly (see the fenced ```yaml block in the "Parametry" section of
+# spec.md). tests/test_spec_compliance.py parses both this file and that
+# fenced block with a real YAML parser (never regex) and fails the build if
+# they diverge, and src/cad_project/parameters.py loads this file directly at
+# runtime so the code can never drift from it either.
+#
+# Do not hardcode any of these numbers anywhere else in the codebase.
+
+project:
+  name: "Mounting Bracket"
+  model_id: "bracket-001"
+  spec_version: "1.0.0"
+  units: "mm"
+
+parameters:
+  - id: length
+    name: "Długość podstawy"
+    value: 100.0
+    unit: mm
+    tolerance: 0.05
+    description: >
+      Całkowita długość podstawy uchwytu wzdłuż osi X (przed zaokrągleniem
+      krawędzi zewnętrznych).
+
+  - id: width
+    name: "Szerokość podstawy"
+    value: 40.0
+    unit: mm
+    tolerance: 0.05
+    description: >
+      Całkowita szerokość podstawy uchwytu wzdłuż osi Y (przed zaokrągleniem
+      krawędzi zewnętrznych).
+
+  - id: base_thickness
+    name: "Grubość podstawy"
+    value: 5.0
+    unit: mm
+    tolerance: 0.05
+    description: Grubość płyty bazowej wzdłuż osi Z.
+
+  - id: hole_count
+    name: "Liczba otworów montażowych"
+    value: 4
+    unit: count
+    tolerance: 0
+    description: Liczba otworów montażowych, po jednym w każdym rogu podstawy.
+
+  - id: hole_diameter
+    name: "Średnica otworów montażowych"
+    value: 5.0
+    unit: mm
+    tolerance: 0.02
+    description: Średnica każdego z czterech otworów montażowych.
+
+  - id: hole_edge_offset
+    name: "Odsunięcie środka otworu od krawędzi"
+    value: 8.0
+    unit: mm
+    tolerance: 0.05
+    description: >
+      Odległość od środka otworu montażowego do najbliższej krawędzi podstawy
+      (mierzona niezależnie wzdłuż osi X i osi Y, przed zaokrągleniem
+      krawędzi).
+
+  - id: fillet_radius
+    name: "Promień zaokrąglenia krawędzi zewnętrznych"
+    value: 3.0
+    unit: mm
+    tolerance: 0.05
+    description: >
+      Promień zaokrąglenia czterech pionowych, zewnętrznych krawędzi
+      podstawy (narożniki).
+
+  - id: material_density
+    name: "Gęstość materiału (opcjonalna, do obliczenia masy)"
+    value: 2.70e-6
+    unit: kg/mm3
+    tolerance: 0
+    description: >
+      Domyślna gęstość materiału (aluminium 6061) używana wyłącznie do
+      opcjonalnego obliczenia masy w raporcie pomiarowym. Nie jest wymiarem
+      geometrycznym i nie podlega walidacji bounding-boxa.
