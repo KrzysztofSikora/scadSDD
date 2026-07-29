@@ -38,7 +38,7 @@ def test_thread_engagement_maintained_at_max_extension():
         + p.NUT_BOSS_LENGTH_MM
         + p.COLLAR_LENGTH_MM
         + p.U_WALL_THICKNESS_MM
-        + p.U_INTERNAL_WIDTH_MM / 2
+        + p.BARREL_DIAMETER_REFERENCE_MM / 2
     )
     exposed_max = p.WALL_TO_BARREL_CENTER_MAX_MM - fixed_offset
     engagement_at_max = p.ROD_THREADED_LENGTH_MM - exposed_max
@@ -46,14 +46,14 @@ def test_thread_engagement_maintained_at_max_extension():
 
 
 def test_arm_bounding_box_is_symmetric_about_the_thread_axis(built_result):
-    """Independent check that the U cradle is coaxial with the rod/thread axis.
+    """Independent check that the C cradle is coaxial with the rod/thread axis.
 
     Unlike the fixed-offset arithmetic checks above (which just re-derive
     the same formula as the production code), this measures the actual
-    built solid: if the U cradle were off-axis (as it was before the
-    coaxial alignment fix — see specs/rifle-mount/decisions.md), the
-    bounding box would be lopsided in X (e.g. min=-13.5, max=31) instead of
-    symmetric around the rod's own central axis.
+    built solid: if the cradle were off-axis, the bounding box would be
+    lopsided in X instead of symmetric around the rod's own central axis.
+    After the U -> C reorientation (see specs/rifle-mount/decisions.md),
+    this symmetry holds by construction, not by tuning a parameter.
     """
     bbox = built_result.arm.part.bounding_box()
     assert pytest.approx(-bbox.max.X, abs=0.5) == bbox.min.X
@@ -65,7 +65,7 @@ def test_adjustment_range_matches_spec():
         + p.NUT_BOSS_LENGTH_MM
         + p.COLLAR_LENGTH_MM
         + p.U_WALL_THICKNESS_MM
-        + p.U_INTERNAL_WIDTH_MM / 2
+        + p.BARREL_DIAMETER_REFERENCE_MM / 2
     )
     exposed_min = p.WALL_TO_BARREL_CENTER_MIN_MM - fixed_offset
     exposed_max = p.WALL_TO_BARREL_CENTER_MAX_MM - fixed_offset

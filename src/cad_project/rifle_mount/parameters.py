@@ -260,21 +260,14 @@ def check_engineering_preconditions() -> None:
             "the barrel to slide in freely."
         )
 
-    # The U cradle is built centered on the rod axis (see model.py), so the
-    # barrel's resting height above the slot floor (barrel_radius) plus the
-    # floor's own offset from the block center must equal half the block's
-    # total height, or the barrel ends up off-axis from the thread again.
-    # See specs/rifle-mount/decisions.md ("U cradle coaxial alignment fix").
-    barrel_radius = BARREL_DIAMETER_REFERENCE_MM / 2
-    u_total_height = U_WALL_THICKNESS_MM + U_ARM_HEIGHT_MM
-    coaxial_offset = (U_WALL_THICKNESS_MM + barrel_radius) - u_total_height / 2
-    if abs(coaxial_offset) > 0.05:
-        raise SpecificationError(
-            "Inconsistent specification: the U cradle is not coaxial with the "
-            f"thread axis (offset {coaxial_offset:.2f} mm). Set u_arm_height to "
-            f"{2 * (U_WALL_THICKNESS_MM + barrel_radius) - U_WALL_THICKNESS_MM} mm "
-            "for exact coaxial alignment."
-        )
+    # The C cradle's symmetric clearance (u_internal_width) now runs along
+    # the axis perpendicular to both the rod and the barrel, centered on
+    # X=0 by construction (see model.py) — coaxiality with the thread axis
+    # no longer depends on any parameter value, unlike the old U shape
+    # (which needed u_arm_height tuned to a specific number for this — see
+    # specs/rifle-mount/decisions.md, "U cradle coaxial alignment fix").
+    # See "U -> C cradle reorientation" in decisions.md for why this check
+    # was removed rather than reformulated.
 
     if LINER_GROOVE_DEPTH_MM >= U_WALL_THICKNESS_MM:
         raise SpecificationError(
@@ -282,18 +275,18 @@ def check_engineering_preconditions() -> None:
             f"smaller than u_wall_thickness ({U_WALL_THICKNESS_MM} mm)."
         )
 
-    # The U cradle is centered on the rod axis, so the barrel's center sits
-    # exactly at the slot's own center along Z: u_wall_thickness (wall
-    # before the slot) + half the slot width. See
-    # specs/rifle-mount/decisions.md ("U cradle coaxial alignment fix") —
-    # this must match src/cad_project/rifle_mount/model.py's u_gap_z_center
-    # exactly, not barrel_diameter_reference/2.
+    # The C cradle's barrel rests against its back wall (adjacent to the
+    # collar), so the barrel's center sits at u_wall_thickness (back wall)
+    # + barrel_diameter_reference/2 past the start of the cradle block. See
+    # specs/rifle-mount/decisions.md ("U -> C cradle reorientation") — this
+    # must match src/cad_project/rifle_mount/model.py's u_gap_z_start
+    # exactly.
     fixed_offset = (
         MOUNTING_PLATE_THICKNESS_MM
         + NUT_BOSS_LENGTH_MM
         + COLLAR_LENGTH_MM
         + U_WALL_THICKNESS_MM
-        + U_INTERNAL_WIDTH_MM / 2
+        + BARREL_DIAMETER_REFERENCE_MM / 2
     )
     exposed_min = WALL_TO_BARREL_CENTER_MIN_MM - fixed_offset
     exposed_max = WALL_TO_BARREL_CENTER_MAX_MM - fixed_offset

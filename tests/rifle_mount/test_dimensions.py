@@ -50,7 +50,7 @@ def test_magnet_edge_offset(built_result):
 def test_arm_bounding_box_length(built_result):
     measurements = measure(built_result.arm.part)
     expected_length = p.ROD_THREADED_LENGTH_MM + p.COLLAR_LENGTH_MM + (
-        2 * p.U_WALL_THICKNESS_MM + p.U_INTERNAL_WIDTH_MM
+        p.U_WALL_THICKNESS_MM + p.U_ARM_HEIGHT_MM
     )
     assert measurements.bounding_box_mm.z_mm == pytest.approx(expected_length, abs=0.2)
 

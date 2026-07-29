@@ -3,7 +3,7 @@
 Two independent parts, matching the physical, hand-assembled product:
 
 * **Base** — square plate with 4 magnet pockets + a threaded nut boss.
-* **Arm** — externally threaded rod + stop collar + U-shaped barrel cradle.
+* **Arm** — externally threaded rod + stop collar + C-shaped barrel cradle.
 
 Building never exports or writes any file. See ``specs/rifle-mount/spec.md``
 ("Geometria") for the operation order and ``specs/rifle-mount/decisions.md``
@@ -23,6 +23,7 @@ typical hardware).
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from bd_warehouse.thread import TrapezoidalThread
@@ -100,6 +101,18 @@ class RifleMountResult:
     arm: ArmPartResult
 
 
+# Empirically, subtracting a single internal TrapezoidalThread solid this
+# long (major_diameter=25mm, pitch=4mm, angle=29deg, nut_wall_thickness=4mm)
+# from the boss becomes an invalid OCCT boolean past roughly 24mm of cut
+# length (produces zero solids, not an exception) - a known robustness
+# limit of bd_warehouse/OCCT for long helical internal cuts, unrelated to
+# this model's specific parameters (reproduced with a bare cylinder too).
+# Splitting the cut into several shorter TrapezoidalThread subtractions,
+# each within this safe length, avoids it - see
+# specs/rifle-mount/decisions.md ("Wydłużenie zazębienia gwintu").
+_MAX_SINGLE_INTERNAL_THREAD_CUT_MM = 20.0
+
+
 def _magnet_positions() -> tuple[tuple[float, float], ...]:
     x = p.MOUNTING_PLATE_SIZE_MM / 2 - p.MAGNET_EDGE_OFFSET_MM
     return ((x, x), (x, -x), (-x, x), (-x, -x))
@@ -137,16 +150,22 @@ def build_base_part() -> BasePartResult:
         extrude(amount=-p.THREAD_ENGAGEMENT_LENGTH_MM, mode=Mode.SUBTRACT)
 
         boss_top_z = p.MOUNTING_PLATE_THICKNESS_MM / 2 + p.NUT_BOSS_LENGTH_MM
-        with Locations(Location((0, 0, boss_top_z - p.THREAD_ENGAGEMENT_LENGTH_MM))):
-            TrapezoidalThread(
-                diameter=p.THREAD_MAJOR_DIAMETER_MM,
-                pitch=p.THREAD_PITCH_MM,
-                thread_angle=p.THREAD_ANGLE_DEG,
-                length=p.THREAD_ENGAGEMENT_LENGTH_MM,
-                external=False,
-                end_finishes=("fade", "fade"),
-                mode=Mode.SUBTRACT,
-            )
+        thread_start_z = boss_top_z - p.THREAD_ENGAGEMENT_LENGTH_MM
+        segment_count = max(
+            1, math.ceil(p.THREAD_ENGAGEMENT_LENGTH_MM / _MAX_SINGLE_INTERNAL_THREAD_CUT_MM)
+        )
+        segment_length = p.THREAD_ENGAGEMENT_LENGTH_MM / segment_count
+        for i in range(segment_count):
+            with Locations(Location((0, 0, thread_start_z + i * segment_length))):
+                TrapezoidalThread(
+                    diameter=p.THREAD_MAJOR_DIAMETER_MM,
+                    pitch=p.THREAD_PITCH_MM,
+                    thread_angle=p.THREAD_ANGLE_DEG,
+                    length=segment_length,
+                    external=False,
+                    end_finishes=("fade", "fade"),
+                    mode=Mode.SUBTRACT,
+                )
 
     assert builder.part is not None, "BuildPart produced no solid"
 
@@ -169,12 +188,13 @@ def build_base_part() -> BasePartResult:
 
 
 def build_arm_part() -> ArmPartResult:
-    """Threaded rod + stop collar + U-shaped barrel cradle.
+    """Threaded rod + stop collar + C-shaped barrel cradle.
 
     Every feature is placed with an explicit ``Location`` (never
     face-selection), so the complex threaded-rod solid never needs its
     faces queried — see the module docstring and
-    specs/rifle-mount/decisions.md ("U orientation").
+    specs/rifle-mount/decisions.md ("U orientation", "U -> C cradle
+    reorientation").
     """
     p.check_engineering_preconditions()
 
@@ -191,16 +211,17 @@ def build_arm_part() -> ArmPartResult:
     )
     core_radius = probe.root_radius
 
-    u_outer_depth = 2 * p.U_WALL_THICKNESS_MM + p.U_INTERNAL_WIDTH_MM
+    # The C-cradle opens toward the arm's tip (away from the collar), not
+    # upward — see specs/rifle-mount/decisions.md ("U -> C cradle
+    # reorientation"). Its symmetric clearance (u_internal_width) now runs
+    # along X, perpendicular to both the rod axis (Z) and the barrel axis
+    # (Y); this makes the barrel coaxial with the rod by construction
+    # (X=0 always, regardless of parameter values), unlike the old U shape
+    # which needed u_arm_height tuned to a specific value for that.
     collar_end_z = p.ROD_THREADED_LENGTH_MM + p.COLLAR_LENGTH_MM
-    u_gap_z_center = collar_end_z + p.U_WALL_THICKNESS_MM + p.U_INTERNAL_WIDTH_MM / 2
-
-    # The U-cradle is centered on the rod's own axis (X=0) rather than
-    # resting tangent to it, so the barrel ends up coaxial with the
-    # thread/rod axis - see specs/rifle-mount/decisions.md ("U cradle
-    # coaxial alignment fix").
-    u_total_height = p.U_WALL_THICKNESS_MM + p.U_ARM_HEIGHT_MM
-    u_floor_x = -u_total_height / 2 + p.U_WALL_THICKNESS_MM
+    u_block_x_extent = 2 * p.U_WALL_THICKNESS_MM + p.U_INTERNAL_WIDTH_MM
+    u_block_z_depth = p.U_WALL_THICKNESS_MM + p.U_ARM_HEIGHT_MM
+    u_gap_z_start = collar_end_z + p.U_WALL_THICKNESS_MM
 
     with BuildPart() as builder:
         Cylinder(
@@ -218,27 +239,27 @@ def build_arm_part() -> ArmPartResult:
 
         with Locations(Location((0, 0, collar_end_z))):
             Box(
-                u_total_height,
+                u_block_x_extent,
                 p.U_ARM_LENGTH_MM,
-                u_outer_depth,
+                u_block_z_depth,
                 align=(Align.CENTER, Align.CENTER, Align.MIN),
             )
 
-        with Locations(Location((u_floor_x, 0, u_gap_z_center))):
+        with Locations(Location((0, 0, u_gap_z_start))):
             Box(
-                p.U_ARM_HEIGHT_MM + 20,
-                p.U_ARM_LENGTH_MM + 4,
                 p.U_INTERNAL_WIDTH_MM,
-                align=(Align.MIN, Align.CENTER, Align.CENTER),
+                p.U_ARM_LENGTH_MM + 4,
+                p.U_ARM_HEIGHT_MM + 20,
+                align=(Align.CENTER, Align.CENTER, Align.MIN),
                 mode=Mode.SUBTRACT,
             )
 
-        with Locations(Location((u_floor_x - 1, 0, u_gap_z_center))):
+        with Locations(Location((0, 0, u_gap_z_start + 1))):
             Box(
-                p.LINER_GROOVE_DEPTH_MM + 1,
-                p.U_ARM_LENGTH_MM + 4,
                 p.LINER_GROOVE_WIDTH_MM,
-                align=(Align.MIN, Align.CENTER, Align.CENTER),
+                p.U_ARM_LENGTH_MM + 4,
+                p.LINER_GROOVE_DEPTH_MM + 1,
+                align=(Align.CENTER, Align.CENTER, Align.MAX),
                 mode=Mode.SUBTRACT,
             )
 

@@ -25,7 +25,7 @@ parameters:
     tolerance: 0.3
     description: >
       Minimalna odległość od ścianki sejfu (powierzchni stykającej się z
-      magnesami) do środka lufy spoczywającej w chwycie U, przy
+      magnesami) do środka lufy spoczywającej w chwycie C, przy
       maksymalnie wkręconym mechanizmie regulacji.
 
   - id: wall_to_barrel_center_max
@@ -44,7 +44,7 @@ parameters:
     tolerance: 0.5
     description: >
       Założona średnica lufy (bez osprzętu) używana wyłącznie do
-      wyznaczenia prześwitu w chwycie U i pozycji środka lufy. Nie jest
+      wyznaczenia prześwitu w chwycie C i pozycji środka lufy. Nie jest
       cechą wytwarzaną modelu.
 
   - id: magnet_diameter
@@ -134,12 +134,15 @@ parameters:
 
   - id: thread_engagement_length
     name: "Efektywna długość zazębienia gwintu"
-    value: 20.0
+    value: 40.0
     unit: mm
     tolerance: 0.2
     description: >
       Długość gwintu wewnętrznego w tulei — stałe zazębienie utrzymywane
       w całym zakresie regulacji (patrz specs/rifle-mount/decisions.md).
+      Wydłużone z 20.0mm do 40.0mm na wyraźne polecenie użytkownika, dla
+      solidniejszego, dłuższego połączenia gwintowego (patrz
+      "Wydłużenie zazębienia gwintu" w decisions.md).
 
   - id: nut_wall_thickness
     name: "Grubość ścianki tulei wokół gwintu"
@@ -152,22 +155,25 @@ parameters:
 
   - id: nut_boss_length
     name: "Długość tulei gwintowanej"
-    value: 24.0
+    value: 44.0
     unit: mm
     tolerance: 0.2
     description: >
       Całkowita długość walcowej tulei na płycie mocującej (zazębienie
-      20mm + margines/wejście na gwint).
+      40mm + margines/wejście na gwint). Wydłużone z 24.0mm razem z
+      thread_engagement_length — patrz decisions.md.
 
   - id: rod_threaded_length
     name: "Długość gwintowanej części trzpienia"
-    value: 108.0
+    value: 112.0
     unit: mm
     tolerance: 0.3
     description: >
       Długość gwintu na trzpieniu, licząc od jego końca wchodzącego w
       tuleję — musi zapewniać pełne zazębienie (thread_engagement_length)
       w całym zakresie regulacji (patrz decisions.md — obliczenie).
+      Wydłużone z 108.0mm do 112.0mm, żeby utrzymać pełne 40mm zazębienia
+      przy maksymalnym wysunięciu (140mm) z zapasem ~6mm.
 
   - id: collar_length
     name: "Długość kołnierza oporowego"
@@ -188,41 +194,46 @@ parameters:
       opierał się o czoło tulei), mniejsza niż średnica zewnętrzna tulei.
 
   - id: u_internal_width
-    name: "Prześwit wewnętrzny chwytu U"
+    name: "Prześwit wewnętrzny chwytu C"
     value: 30.0
     unit: mm
     tolerance: 0.2
     description: >
-      Szerokość wewnętrzna (prześwit) chwytu U, w którą swobodnie wsuwa
-      się lufa.
+      Szerokość wewnętrzna (prześwit) chwytu, w którą swobodnie wsuwa się
+      lufa — mierzona prostopadle do osi trzpienia i prostopadle do osi
+      lufy, symetrycznie wokół osi trzpienia (patrz decisions.md, "U -> C
+      cradle reorientation").
 
   - id: u_arm_length
-    name: "Długość chwytu U wzdłuż osi lufy"
+    name: "Długość chwytu C wzdłuż osi lufy"
     value: 40.0
     unit: mm
     tolerance: 0.2
-    description: Długość (głębokość wzdłuż osi lufy) profilu U.
+    description: Długość (głębokość wzdłuż osi lufy) profilu C.
 
   - id: u_arm_height
-    name: "Wysokość ramion chwytu U"
+    name: "Głębokość otwarcia chwytu C"
     value: 26.0
     unit: mm
     tolerance: 0.2
     description: >
-      Wysokość wewnętrzna ramion U, licząc od dna (powierzchni podpierającej
-      lufę) do górnej krawędzi otwarcia. Wartość dobrana tak, by chwyt U
-      (wraz ze ścianką u_wall_thickness) był wyśrodkowany na osi trzpienia
-      gwintowanego — środek lufy referencyjnej wypada wtedy dokładnie na
-      osi gwintu (współosiowo). Poprawiono z 25.0mm po wykryciu, że chwyt
-      U był przesunięty względem osi trzpienia — patrz
-      specs/rifle-mount/decisions.md ("U cradle coaxial alignment fix").
+      Głębokość otwartej części chwytu wzdłuż osi trzpienia, licząc od
+      wewnętrznej powierzchni tylnej ścianki (o którą opiera się lufa) do
+      czoła ramienia — chwyt jest otwarty na tym końcu (z dala od
+      kołnierza/ściany), nie od góry. Wartość (=u_wall_thickness +
+      barrel_diameter_reference) dobrana tak, by lufa referencyjna
+      mieściła się dokładnie w tej głębokości, stykając się z tylną
+      ścianką. Współosiowość z osią trzpienia jest teraz zapewniona
+      konstrukcyjnie (symetryczny prześwit u_internal_width wzdłuż osi
+      prostopadłej), nie przez dobór tej wartości — patrz
+      specs/rifle-mount/decisions.md ("U -> C cradle reorientation").
 
   - id: u_wall_thickness
-    name: "Grubość ścianek chwytu U"
+    name: "Grubość ścianek chwytu C"
     value: 6.0
     unit: mm
     tolerance: 0.2
-    description: Grubość dna i ramion litery U.
+    description: Grubość tylnej ścianki (oporu) i bocznych ramion chwytu C.
 
   - id: liner_groove_width
     name: "Szerokość rowka na wkładkę filcową"
@@ -230,7 +241,7 @@ parameters:
     unit: mm
     tolerance: 0.1
     description: >
-      Szerokość rowka wzdłuż wewnętrznej powierzchni U na wklejaną
+      Szerokość rowka wzdłuż wewnętrznej powierzchni chwytu na wklejaną
       wkładkę ochronną (filc/guma).
 
   - id: liner_groove_depth
@@ -238,7 +249,7 @@ parameters:
     value: 1.0
     unit: mm
     tolerance: 0.1
-    description: Głębokość rowka na wkładkę ochronną, wcięta w ścianki U.
+    description: Głębokość rowka na wkładkę ochronną, wcięta w tylną ściankę chwytu.
 
   - id: material_density
     name: "Gęstość materiału (opcjonalna, do obliczenia masy)"

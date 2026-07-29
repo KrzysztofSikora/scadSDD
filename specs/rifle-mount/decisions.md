@@ -186,3 +186,91 @@ użytkownika — zakres regulacji (80–140mm), rozmiar prześwitu U (30mm) i
 wszystkie pozostałe wymagania pozostają identyczne. Poprawiono wyłącznie
 to, JAK chwyt U jest ustawiony względem osi trzpienia, zgodnie z
 oczekiwaniem współosiowości.
+
+## 2026-07-29 — Reorientacja chwytu: U -> C (zgłoszone przez użytkownika po obejrzeniu w FreeCAD)
+
+**Problem zgłoszony przez użytkownika**: po obejrzeniu Części B w FreeCAD,
+użytkownik ocenił, że profil chwytu, patrząc z boku (wzdłuż osi lufy),
+powinien wyglądać jak litera „C" (otwarty do przodu, w stronę czubka
+ramienia), a nie jak „U" (otwarty do góry, prostopadle do osi trzpienia).
+To decyzja projektowa użytkownika co do kształtu produktu, nie błąd
+implementacji (w przeciwieństwie do poprzedniej poprawki współosiowości
+powyżej).
+
+**Analiza geometryczna**: chwyt U/C żyje w płaszczyźnie prostopadłej do
+osi lufy (Y), rozpiętej przez oś trzpienia (Z) i oś prostopadłą (X).
+Pierwotnie otwarcie było wzdłuż X (symetryczna „szerokość" prześwitu
+`u_internal_width` wzdłuż Z), co odczytuje się jako „U" patrząc z osią
+trzpienia poziomo. Jedyna sensowna reorientacja o 90° wokół osi lufy to
+zamiana ról X i Z: otwarcie przenosi się na Z (w stronę czubka ramienia —
+otwarcie w stronę kołnierza jest niemożliwe, bo kolidowałoby fizycznie z
+kołnierzem), a symetryczny prześwit (`u_internal_width`) przenosi się na
+X. To nie jest wybór między kilkoma opcjami, tylko jedyna geometrycznie
+spójna interpretacja polecenia „jak C, nie jak U".
+
+**Konsekwencja dla współosiowości**: w nowej orientacji oś X (dawniej
+wymagająca starannego doboru `u_arm_height`, żeby wypaść dokładnie na
+osi trzpienia — patrz poprawka wyżej) jest symetryczna **z konstrukcji**
+(prześwit `u_internal_width` wyśrodkowany wokół X=0 niezależnie od
+wartości innych parametrów). Poprzedni check `coaxial_offset` w
+`check_engineering_preconditions()` stał się więc nieaktualny (sprawdzał
+zależność, która już nie istnieje) i został usunięty — współosiowość jest
+teraz niezmiennikiem geometrii, nie czymś do zwalidowania przy każdej
+zmianie parametrów.
+
+**Konsekwencja dla `fixed_offset`**: oś Z (dawniej symetryczny prześwit,
+`u_wall_thickness + u_internal_width/2` = 21mm) staje się teraz
+asymetryczna (ściana oporowa + głębokość otwarcia), analogicznie do tego,
+jak wcześniej działała oś X: lufa opiera się o tylną ściankę, więc
+odległość od kołnierza do środka lufy = `u_wall_thickness +
+barrel_diameter_reference/2` = 6+10 = **16mm** (zamiast 21mm). To
+przywraca pierwotną, prostszą formułę sprzed poprawki współosiowości
+(54mm — patrz wyżej), zanim uwzględniono w niej rozmiar tulei
+(`nut_boss_length`) po jego wydłużeniu (patrz niżej) — ostateczny
+`fixed_offset` = 74mm, patrz `spec.md` ("Zależność geometryczna").
+
+`u_arm_height` (26mm) nie wymagał zmiany — liczbowo odpowiada
+`u_wall_thickness + barrel_diameter_reference` (6+20=26), więc lufa
+mieści się dokładnie w głębokości otwarcia, stykając się z tylną ścianką
+i kończąc równo z otwartym czołem ramienia. Ten sam numeryczny dobór,
+który wcześniej (przypadkowo, przez konstrukcję wzoru współosiowości)
+zapewniał symetrię w X, teraz naturalnie zapewnia dopasowanie głębokości
+w Z — bez dodatkowego przeliczania.
+
+**Implementacja** (`src/cad_project/rifle_mount/model.py::build_arm_part`):
+blok chwytu i wycięcie prześwitu zamieniły role osi X i Z (patrz kod);
+rowek na wkładkę filcową analogicznie przeniesiony z tylnej ścianki wzdłuż
+Z (był wzdłuż X). Bok chwytu wzdłuż lufy (Y, `u_arm_length`) bez zmian.
+
+**Uzasadnienie**: to zmiana kształtu na wyraźne życzenie użytkownika, nie
+domysł inżynierski — geometria (kierunek otwarcia) była jednoznacznie
+wyprowadzalna z opisu „jak C, nie jak U" plus ograniczenia fizycznego
+(nie może kolidować z kołnierzem), a numeryczna konsekwencja
+(`fixed_offset`) jest przeliczeniem, nie zgadywaniem.
+
+## 2026-07-29 — Wydłużenie zazębienia gwintu (na wyraźne polecenie użytkownika)
+
+**Decyzja**: `thread_engagement_length` 20mm → **40mm** (+100%,
+zatwierdzone przez użytkownika spośród zaproponowanych opcji +50%/+100%/
+własna wartość). Odpowiednio wydłużono `nut_boss_length` 24mm → **44mm**
+(zachowując wzorzec „zazębienie + 4mm marginesu/wejścia na gwint") oraz
+`rod_threaded_length` 108mm → **112mm**.
+
+**Obliczenie `rod_threaded_length`** (z uwzględnieniem nowego
+`fixed_offset` = 74mm po reorientacji U→C powyżej):
+```
+exposed_max = wall_to_barrel_center_max - fixed_offset = 140 - 74 = 66mm
+rod_threaded_length >= exposed_max + thread_engagement_length
+                     = 66 + 40 = 106mm
+=> przyjęto rod_threaded_length = 112mm (6mm marginesu bezpieczeństwa,
+   analogicznie do marginesu przyjętego w pierwotnym wyprowadzeniu)
+```
+
+**Uzasadnienie**: użytkownik zauważył, że po reorientacji U→C margines
+zazębienia przy maksymalnym wysunięciu skurczyłby się z 7mm do ~2mm
+(przy niezmienionym 108mm), i wprost poprosił o wydłużenie zarówno
+zazębienia gwintu, jak i tulei w Części A, w którą wkręca się trzpień —
+to wymóg bezpieczeństwa/solidności połączenia (patrz
+`specs/rifle-mount/constraints.md`, pkt 2), nie kwestia gustu. Docelowa
+wartość (+100%) została wybrana przez użytkownika spośród
+przedstawionych opcji, nie zgadnięta.

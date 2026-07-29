@@ -123,7 +123,7 @@ def _arm_feature_checks(features: ArmFeatures) -> list[ValidationCheck]:
     return [
         _dimension_check(
             "u_internal_width",
-            "Prześwit chwytu U zgodny ze specyfikacją.",
+            "Prześwit chwytu C zgodny ze specyfikacją.",
             p.U_INTERNAL_WIDTH_MM,
             features.u_internal_width_mm,
             p.tolerance_for("u_internal_width"),
@@ -168,17 +168,17 @@ def _thread_compatibility_check(base: BaseFeatures, arm: ArmFeatures) -> Validat
 def _thread_engagement_range_check() -> ValidationCheck:
     """Recompute the fixed-offset/engagement derivation from specs/rifle-mount/decisions.md.
 
-    The U cradle is centered on the rod axis, so the Z-offset from the
-    collar to the barrel center is u_wall_thickness + u_internal_width/2
-    (the slot's own center), not barrel_diameter_reference/2 — see
-    "U cradle coaxial alignment fix" in decisions.md.
+    The C cradle's barrel rests against its back wall (next to the
+    collar), so the Z-offset from the collar to the barrel center is
+    u_wall_thickness + barrel_diameter_reference/2 — see
+    "U -> C cradle reorientation" in decisions.md.
     """
     fixed_offset = (
         p.MOUNTING_PLATE_THICKNESS_MM
         + p.NUT_BOSS_LENGTH_MM
         + p.COLLAR_LENGTH_MM
         + p.U_WALL_THICKNESS_MM
-        + p.U_INTERNAL_WIDTH_MM / 2
+        + p.BARREL_DIAMETER_REFERENCE_MM / 2
     )
     exposed_max = p.WALL_TO_BARREL_CENTER_MAX_MM - fixed_offset
     min_engagement_at_max_extension = p.ROD_THREADED_LENGTH_MM - exposed_max
