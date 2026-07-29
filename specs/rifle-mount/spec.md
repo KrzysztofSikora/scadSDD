@@ -11,8 +11,14 @@
 |------------------------|-----------------------------------|
 | Nazwa projektu        | Magnetic Rifle Barrel Mount       |
 | Identyfikator modelu  | `magnetic-rifle-mount-001`        |
-| Wersja specyfikacji   | `1.0.0`                           |
+| Wersja specyfikacji   | `2.0.0`                           |
 | Jednostki             | milimetry (mm)                    |
+
+**Iteracja 2 (v2, ta wersja)**: zachowuje zakres regulacji 80–140mm z v1
+bez zmian (był już poprawny) i dodaje łagodne, drukowalne-bez-podpór
+przejście między kołnierzem a chwytem C — patrz "Geometria" niżej oraz
+`specs/rifle-mount/decisions.md` ("v2 — łagodne przejście C/gwint") po
+pełne uzasadnienie i wyprowadzenie liczb.
 
 ## Opis funkcjonalny
 
@@ -58,7 +64,9 @@ Markdownie).
 | Długość tulei | `nut_boss_length` | 44.0 | mm | ±0.2 |
 | Długość gwintu na trzpieniu | `rod_threaded_length` | 112.0 | mm | ±0.3 |
 | Długość kołnierza | `collar_length` | 10.0 | mm | ±0.2 |
-| Średnica kołnierza | `collar_diameter` | 27.0 | mm | ±0.1 |
+| Średnica kołnierza | `collar_diameter` | 32.0 | mm | ±0.1 |
+| Wysokość przejścia kołnierz->C | `cradle_transition_height` | 5.5 | mm | ±0.2 |
+| Promień zaokrąglenia bloku C | `cradle_corner_fillet_radius` | 19.0 | mm | ±0.2 |
 | Prześwit C | `u_internal_width` | 30.0 | mm | ±0.2 |
 | Długość C (wzdłuż lufy) | `u_arm_length` | 40.0 | mm | ±0.2 |
 | Głębokość otwarcia C | `u_arm_height` | 26.0 | mm | ±0.2 |
@@ -73,7 +81,7 @@ Markdownie).
 project:
   name: "Magnetic Rifle Barrel Mount"
   model_id: "magnetic-rifle-mount-001"
-  spec_version: "1.0.0"
+  spec_version: "2.0.0"
   units: "mm"
 
 parameters:
@@ -245,12 +253,44 @@ parameters:
 
   - id: collar_diameter
     name: "Średnica kołnierza oporowego"
-    value: 27.0
+    value: 32.0
     unit: mm
     tolerance: 0.1
     description: >
       Średnica kołnierza — większa niż thread_major_diameter (żeby
       opierał się o czoło tulei), mniejsza niż średnica zewnętrzna tulei.
+      Powiększona z 27.0mm do 32.0mm w v2, żeby skrócić wymagany skok
+      łagodnego przejścia do chwytu C (patrz cradle_transition_height,
+      specs/rifle-mount/decisions.md "v2 — łagodne przejście C/gwint").
+
+  - id: cradle_transition_height
+    name: "Wysokość łagodnego przejścia kołnierz -> chwyt C"
+    value: 5.5
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Wysokość lofterowanego (płynnego) przejścia między okręgiem
+      kołnierza (collar_diameter) a zaokrąglonym profilem chwytu C
+      (cradle_corner_fillet_radius), wstawionego w osi Z między kołnierzem
+      a blokiem chwytu C. Dodane w v2, żeby wyeliminować nagły, 90-stopniowy
+      nawis (wcześniej ~15.5mm) i umożliwić druk 3D bez podpór — patrz
+      specs/rifle-mount/decisions.md "v2 — łagodne przejście C/gwint" po
+      pełne wyprowadzenie kąta narostu (~42.4°, zmierzone bezpośrednio na
+      geometrii, poniżej progu samo-podpierania 45°).
+
+  - id: cradle_corner_fillet_radius
+    name: "Promień zaokrąglenia narożników bloku chwytu C"
+    value: 19.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Promień zaokrąglenia czterech pionowych krawędzi zewnętrznego profilu
+      bloku chwytu C (2×u_wall_thickness + u_internal_width szerokości,
+      u_arm_length długości) — zbliża profil do kształtu stadionu/owalu,
+      żeby zminimalizować maksymalny promieniowy nawis względem kołnierza
+      poniżej. Ten sam promień jest użyty do profilu górnego lofterowanego
+      przejścia (cradle_transition_height), żeby oba elementy stykały się
+      bez szwu. Dodane w v2 — patrz specs/rifle-mount/decisions.md.
 
   - id: u_internal_width
     name: "Prześwit wewnętrzny chwytu C"
@@ -347,19 +387,31 @@ Kolejność operacji (patrz `src/cad_project/rifle_mount/model.py`):
 2. **Kołnierz oporowy**: walec Ø`collar_diameter` × `collar_length`,
    współosiowy, na końcu trzpienia — ogranicza maksymalne wkręcenie
    (opiera się o czoło tulei Części A).
-3. **Chwyt C**: profil w kształcie litery C (prześwit wewnętrzny
+3. **Łagodne przejście kołnierz → chwyt C** (nowe w v2): lofterowana
+   (płynna) bryła między okręgiem Ø`collar_diameter` (u szczytu kołnierza)
+   a zaokrąglonym prostokątnym profilem bloku chwytu C
+   (`cradle_corner_fillet_radius`, patrz niżej), na wysokości
+   `cradle_transition_height`. Eliminuje nagły, prostopadły nawis między
+   wąskim kołnierzem a szerszym blokiem C, umożliwiając druk 3D **bez
+   podpór** — patrz "Reguły" i `decisions.md` ("v2 — łagodne przejście
+   C/gwint") po pełne wyprowadzenie kąta narostu.
+4. **Chwyt C**: profil w kształcie litery C (prześwit wewnętrzny
    `u_internal_width` mierzony prostopadle do osi trzpienia, ścianki
    `u_wall_thickness`, otwór skierowany "do przodu" — w stronę czubka
    ramienia, z dala od kołnierza/ściany, a nie do góry), **wyśrodkowany
    na osi trzpienia/kołnierza** (prześwit symetryczny wokół osi, nie
    oparty stycznie z boku), tak by lufa spoczywająca w chwycie leżała
    współosiowo z gwintem — wyciągnięty na długość `u_arm_length` wzdłuż
-   osi lufy (prostopadle do osi regulacji), doklejony do kołnierza.
-   Głębokość otwarcia (`u_arm_height`) liczona od wewnętrznej
-   powierzchni tylnej ścianki (o którą opiera się lufa) do otwartego
-   czoła ramienia. Na wewnętrznej powierzchni tylnej ścianki rowek
-   (`liner_groove_width` × `liner_groove_depth`) na wklejaną wkładkę
-   ochronną.
+   osi lufy (prostopadle do osi regulacji), doklejony do przejścia
+   (a przez nie — do kołnierza). Zewnętrzny profil bloku (prostokąt
+   `2×u_wall_thickness + u_internal_width` × `u_arm_length`) ma
+   zaokrąglone 4 pionowe krawędzie promieniem `cradle_corner_fillet_radius`
+   — dokładnie ten sam promień co górny profil przejścia z punktu 3, żeby
+   oba elementy stykały się bez szwu/skoku. Głębokość otwarcia
+   (`u_arm_height`) liczona od wewnętrznej powierzchni tylnej ścianki (o
+   którą opiera się lufa) do otwartego czoła ramienia. Na wewnętrznej
+   powierzchni tylnej ścianki rowek (`liner_groove_width` ×
+   `liner_groove_depth`) na wklejaną wkładkę ochronną.
 
 ### Zależność geometryczna (wyprowadzenie w `decisions.md`)
 
@@ -371,16 +423,28 @@ referencyjnej leży dokładnie na osi gwintu/regulacji. Odległość od
 kołnierza do środka lufy wzdłuż osi regulacji to `u_wall_thickness +
 barrel_diameter_reference/2` (lufa styka się z tylną ścianką chwytu C).
 
-Stały offset (części niezmienne przy regulacji):
+Stały offset (części niezmienne przy regulacji), **od v2 z doliczonym
+`cradle_transition_height`**:
 `mounting_plate_thickness + nut_boss_length + collar_length +
-u_wall_thickness + barrel_diameter_reference/2` = 4+44+10+6+10 = **74 mm**.
+cradle_transition_height + u_wall_thickness + barrel_diameter_reference/2`
+= 4+44+10+5.5+6+10 = **79.5 mm**.
 
 Wysuw trzpienia (część zmienna) = `wall_to_barrel_center_{min,max} -
-74mm` = 6–66 mm (rozpiętość 60 mm, zgodna z różnicą
+79.5mm` = **0.5–60.5 mm** (rozpiętość 60 mm, zgodna z różnicą
 `wall_to_barrel_center_max - wall_to_barrel_center_min`).
 
-`rod_threaded_length` (112 mm) musi być ≥ wysuw_max (66mm) +
-`thread_engagement_length` (40mm) = 106mm — spełnione z 6mm marginesu.
+`rod_threaded_length` (112 mm) musi być ≥ wysuw_max (60.5mm) +
+`thread_engagement_length` (40mm) = 100.5mm — spełnione z 11.5mm
+marginesu (poprawa względem v1, bo `cradle_transition_height` skraca
+wysuw, nie wydłuża go).
+
+**Uwaga o marginesie przy minimum (v2)**: wysuw przy minimalnej
+odległości (80mm) wynosi tylko **0.5mm** — to bardzo mały, ale dodatni
+zapas (wymagany ściśle > 0 przez
+`check_engineering_preconditions()`). Patrz
+`specs/rifle-mount/constraints.md` po opis tego ograniczenia i
+`decisions.md` po analizę alternatyw, które rozważono i odrzucono na
+rzecz zachowania dokładnego zakresu 80–140mm.
 
 ## Reguły
 
@@ -404,6 +468,18 @@ Wysuw trzpienia (część zmienna) = `wall_to_barrel_center_{min,max} -
   magnet_pocket_wall_thickness`.
 * Żadna z dwóch części nie może mieć ujemnej objętości ani pustej
   geometrii; każda z osobna ma być pojedynczą bryłą.
+* **(v2)** `cradle_corner_fillet_radius` musi być mniejszy niż połowa
+  krótszego wymiaru profilu bloku C (`min(u_wall_thickness +
+  u_internal_width/2, u_arm_length/2)`), inaczej zaokrąglenie jest
+  geometrycznie niemożliwe do wykonania na prostokątnym profilu.
+* **(v2) Przejście kołnierz → chwyt C musi być drukowalne bez podpór**:
+  maksymalny kąt narostu (liczony od maksymalnego promienia
+  zaokrąglonego profilu bloku C względem promienia kołnierza, na
+  wysokości `cradle_transition_height`) musi być ≤ 45° od pionu —
+  standardowy próg samo-podpierania w druku FDM. Sprawdzane jawnie w
+  `check_engineering_preconditions()` — patrz
+  `specs/rifle-mount/decisions.md` po wyprowadzenie i zmierzoną wartość
+  (~42.4°).
 
 ## Oczekiwane wyniki
 
@@ -432,3 +508,6 @@ generuje pliki dla **obu części osobno**:
       i osobno zaraportowany, bez blokowania eksportu STEP/STL),
 - [ ] wszystkie testy `pytest tests/rifle_mount/` przechodzą,
 - [ ] raport walidacji ma status `passed`.
+- [ ] **(v2)** zakres regulacji pozostaje dokładnie 80–140mm (8–14cm),
+- [ ] **(v2)** przejście kołnierz → chwyt C nie ma nawisu > 45° od pionu
+      (samo-podpierające, drukowalne bez podpór).

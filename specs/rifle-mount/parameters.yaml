@@ -14,7 +14,7 @@
 project:
   name: "Magnetic Rifle Barrel Mount"
   model_id: "magnetic-rifle-mount-001"
-  spec_version: "1.0.0"
+  spec_version: "2.0.0"
   units: "mm"
 
 parameters:
@@ -186,12 +186,44 @@ parameters:
 
   - id: collar_diameter
     name: "Średnica kołnierza oporowego"
-    value: 27.0
+    value: 32.0
     unit: mm
     tolerance: 0.1
     description: >
       Średnica kołnierza — większa niż thread_major_diameter (żeby
       opierał się o czoło tulei), mniejsza niż średnica zewnętrzna tulei.
+      Powiększona z 27.0mm do 32.0mm w v2, żeby skrócić wymagany skok
+      łagodnego przejścia do chwytu C (patrz cradle_transition_height,
+      specs/rifle-mount/decisions.md "v2 — łagodne przejście C/gwint").
+
+  - id: cradle_transition_height
+    name: "Wysokość łagodnego przejścia kołnierz -> chwyt C"
+    value: 5.5
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Wysokość lofterowanego (płynnego) przejścia między okręgiem
+      kołnierza (collar_diameter) a zaokrąglonym profilem chwytu C
+      (cradle_corner_fillet_radius), wstawionego w osi Z między kołnierzem
+      a blokiem chwytu C. Dodane w v2, żeby wyeliminować nagły, 90-stopniowy
+      nawis (wcześniej ~15.5mm) i umożliwić druk 3D bez podpór — patrz
+      specs/rifle-mount/decisions.md "v2 — łagodne przejście C/gwint" po
+      pełne wyprowadzenie kąta narostu (~42.4°, zmierzone bezpośrednio na
+      geometrii, poniżej progu samo-podpierania 45°).
+
+  - id: cradle_corner_fillet_radius
+    name: "Promień zaokrąglenia narożników bloku chwytu C"
+    value: 19.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Promień zaokrąglenia czterech pionowych krawędzi zewnętrznego profilu
+      bloku chwytu C (2×u_wall_thickness + u_internal_width szerokości,
+      u_arm_length długości) — zbliża profil do kształtu stadionu/owalu,
+      żeby zminimalizować maksymalny promieniowy nawis względem kołnierza
+      poniżej. Ten sam promień jest użyty do profilu górnego lofterowanego
+      przejścia (cradle_transition_height), żeby oba elementy stykały się
+      bez szwu. Dodane w v2 — patrz specs/rifle-mount/decisions.md.
 
   - id: u_internal_width
     name: "Prześwit wewnętrzny chwytu C"

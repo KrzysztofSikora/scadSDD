@@ -274,3 +274,111 @@ to wymóg bezpieczeństwa/solidności połączenia (patrz
 `specs/rifle-mount/constraints.md`, pkt 2), nie kwestia gustu. Docelowa
 wartość (+100%) została wybrana przez użytkownika spośród
 przedstawionych opcji, nie zgadnięta.
+
+## 2026-07-29 — v2: łagodne przejście kołnierz → chwyt C (bez podpór przy druku)
+
+**Żądanie użytkownika**: (1) regulacja odległości lufy od ścianki sejfu w
+zakresie 8–14 cm — **już spełnione w v1** (`wall_to_barrel_center_min/max`
+= 80/140mm to dokładnie 8/14cm; sprawdzono, że wyprowadzenie w tym pliku i
+`check_engineering_preconditions()` są poprawne, nic tu nie wymagało
+zmiany); (2) łagodne przejście między chwytem C a gwintem, tak żeby nie
+trzeba było dodawać podpór przy druku 3D — to wymagało realnej zmiany
+geometrii, opisanej niżej. Cała iteracja oznaczona jako **v2**
+(`spec_version: "2.0.0"`).
+
+**Diagnoza problemu z nawisem**: w v1 blok chwytu C (profil
+`2×u_wall_thickness + u_internal_width` × `u_arm_length` = 42×40mm) siadał
+bezpośrednio na kołnierzu Ø27mm (promień 13.5mm) — to nagły, 90-stopniowy
+skok. Maksymalny promieniowy nawis (w rogach prostokątnego bloku,
+odległość od osi = `sqrt(21² + 20²)` = **29mm** — trójkąt 20-21-29,
+dokładny Pitagorejski) minus promień kołnierza = **15.5mm** nawisu bez
+żadnego podparcia. Standardowy próg samo-podpierania w druku FDM to ~45°
+od pionu — dla 15.5mm nawisu wymagałoby to ~15.5mm dodatkowej wysokości
+przejścia.
+
+**Konflikt z zakresem regulacji**: sztywna (nieregulowana) część
+mechanizmu w v1 miała `fixed_offset` = 74mm (patrz wyprowadzenie wyżej), a
+minimalna odległość to 80mm — czyli tylko **6mm zapasu** zanim
+`wall_to_barrel_center_min` zostałoby naruszone (wysuw trzpienia musi
+pozostać > 0 przy w pełni wkręconym mechanizmie). 15.5mm przejścia się
+tam nie mieści. Użytkownik został o tym poinformowany wprost (nie
+zgadywano rozwiązania) i zapytany, czy: (a) zachować dokładnie 80–140mm
+kosztem bardzo małego marginesu mechanicznego, (b) lekko podnieść dolną
+granicę (np. do 85–90mm) dla wygodnego marginesu, czy (c) wskazać własną
+wartość pośrednią. **Użytkownik wybrał (a)** — zachować dokładnie
+80–140mm.
+
+**Rozwiązanie geometryczne** (żeby zmieścić przejście w 6mm zapasu):
+
+1. `collar_diameter`: 27.0mm → **32.0mm** (nadal < `nut_boss_outer_diameter`
+   = 33mm i > `thread_major_diameter` = 25mm — mieści się w istniejących
+   ograniczeniach z `check_engineering_preconditions()`, tylko przesunięte
+   bliżej górnej granicy; ~0.5mm promieniowego luzu do czoła tulei, patrz
+   `constraints.md`).
+2. Nowy parametr `cradle_corner_fillet_radius` = **19mm** — zaokrąglenie
+   czterech pionowych krawędzi zewnętrznego profilu bloku C, zbliżające
+   go do kształtu stadionu/owalu. To redukuje maksymalny promieniowy
+   nawis z 29mm (róg ostrego prostokąta) do ~21.0–21.2mm (potwierdzone
+   zarówno analitycznie — `hypot(21-19, 20-19) + 19 ≈ 21.24mm` — jak i
+   bezpośrednim pomiarem przekrojów zbudowanej geometrii, patrz niżej).
+3. Nowy parametr `cradle_transition_height` = **5.5mm** — lofterowana
+   (płynna) bryła między okręgiem Ø32mm (szczyt kołnierza) a zaokrąglonym
+   profilem bloku C z punktu 2 (ten sam promień `cradle_corner_fillet_radius`
+   po obu stronach, żeby przejście i blok stykały się bez szwu).
+
+**Weryfikacja kąta narostu — zmierzona, nie tylko wyliczona**: zbudowano
+prototyp geometrii (kołnierz Ø32 + lofterowane przejście 5.5mm + blok
+zaokrąglony r=19mm) i próbkowano przekroje `part.intersect(cienki_box)` co
+0.5mm wysokości. Zmierzony promień rósł liniowo od 16.0mm (przy kołnierzu)
+do 21.02mm (szczyt przejścia) w sposób monotoniczny — dając kąt narostu
+**~42.4°** (`atan((21.02-16.0)/5.5)`), poniżej progu 45° z ~2.6° zapasu.
+Cała zbudowana bryła Części B (kołnierz + przejście + zaokrąglony blok +
+wycięcie C + gwint zewnętrzny) to nadal dokładnie 1 poprawna bryła
+(`is_valid=True`) — sprawdzone przed wdrożeniem do `model.py`.
+
+**Nowy `fixed_offset`** (dodano `cradle_transition_height`):
+```
+fixed_offset = mounting_plate_thickness + nut_boss_length + collar_length
+             + cradle_transition_height + u_wall_thickness
+             + barrel_diameter_reference/2
+             = 4 + 44 + 10 + 5.5 + 6 + 10 = 79.5 mm
+
+exposed_min = wall_to_barrel_center_min - fixed_offset = 80 - 79.5 = 0.5 mm
+exposed_max = wall_to_barrel_center_max - fixed_offset = 140 - 79.5 = 60.5 mm
+```
+`exposed_min` = **0.5mm** — bardzo mały, ale ściśle dodatni zapas (wymóg
+`check_engineering_preconditions()`: `exposed_min > 0`). To świadomy,
+zaakceptowany przez użytkownika kompromis (opcja (a) wyżej) — patrz
+`specs/rifle-mount/constraints.md` po jawne udokumentowanie tego
+ograniczenia jako znanego dla v2.
+
+`rod_threaded_length` (112mm, bez zmian) nadal z zapasem: wymagane
+minimum = `exposed_max + thread_engagement_length` = 60.5 + 40 = 100.5mm,
+margines 11.5mm (**lepiej** niż w v1, bo `cradle_transition_height`
+skraca wysuw zamiast go wydłużać).
+
+**Implementacja** (`src/cad_project/rifle_mount/model.py::build_arm_part`):
+blok chwytu C jest teraz dodawany i filetowany (`cradle_corner_fillet_radius`
+na jego 4 pionowych krawędziach) jako pierwszy element w `BuildPart`, żeby
+`builder.edges().filter_by(Axis.Z)` jednoznacznie wybierało tylko jego
+własne krawędzie (ten sam wzorzec co zaokrąglenie płyty w
+`build_base_part`) — bez ryzyka złapania przypadkowych krawędzi z innych
+elementów. Przejście to `loft()` między szkicem okręgu (na wysokości
+szczytu kołnierza) a szkicem `RectangleRounded` (na wysokości startu
+bloku C), oba jako jawne `Plane.XY.offset(z)` — zgodnie z zasadą modułu
+"nigdy selekcji przez face()" (patrz docstring `model.py`), bo topologia
+gwintu uniemożliwia bezpieczną selekcję przez faces().
+
+**Nowe reguły walidacji** w
+`check_engineering_preconditions()`: (1) `cradle_corner_fillet_radius`
+musi być mniejszy niż połowa krótszego wymiaru profilu bloku C (inaczej
+zaokrąglenie jest geometrycznie niewykonalne); (2) kąt narostu przejścia
+(z konserwatywnego, analitycznego wzoru na narożnik — który daje ~21.24mm,
+**większe** niż zmierzone ~21.02mm, więc jest to bezpieczne górne
+oszacowanie) musi być ≤ 45°.
+
+**Uzasadnienie całości**: to zmiana geometrii na wyraźne życzenie
+użytkownika (łagodne przejście bez podpór), z liczbami wyprowadzonymi i
+zmierzonymi (nie zgadniętymi) oraz z jawnym pytaniem do użytkownika w
+punkcie, gdzie wymagania (dokładny zakres 80–140mm) i inżynieria
+(potrzebna wysokość przejścia) się ze sobą ścierały.

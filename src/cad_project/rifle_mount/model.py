@@ -39,8 +39,11 @@ from build123d import (
     Locations,
     Mode,
     Part,
+    Plane,
+    RectangleRounded,
     extrude,
     fillet,
+    loft,
 )
 
 from cad_project.rifle_mount import parameters as p
@@ -75,6 +78,8 @@ class ArmFeatures:
     rod_threaded_length_mm: float
     collar_diameter_mm: float
     collar_length_mm: float
+    cradle_transition_height_mm: float
+    cradle_corner_fillet_radius_mm: float
     u_internal_width_mm: float
     u_arm_length_mm: float
     u_wall_thickness_mm: float
@@ -188,13 +193,22 @@ def build_base_part() -> BasePartResult:
 
 
 def build_arm_part() -> ArmPartResult:
-    """Threaded rod + stop collar + C-shaped barrel cradle.
+    """Threaded rod + stop collar + smooth transition + C-shaped barrel cradle.
 
     Every feature is placed with an explicit ``Location`` (never
     face-selection), so the complex threaded-rod solid never needs its
     faces queried — see the module docstring and
     specs/rifle-mount/decisions.md ("U orientation", "U -> C cradle
     reorientation").
+
+    v2 adds a smooth (lofted) transition between the collar and the
+    C-cradle block, and rounds the block's outer vertical edges, so the
+    arm prints without support material — see decisions.md ("v2 —
+    łagodne przejście C/gwint"). The cradle block is built and filleted
+    *first*, while it is the only solid in the builder, so
+    ``builder.edges().filter_by(Axis.Z)`` unambiguously selects only its
+    own 4 corner edges (mirrors the plate-corner fillet pattern in
+    ``build_base_part``).
     """
     p.check_engineering_preconditions()
 
@@ -219,11 +233,22 @@ def build_arm_part() -> ArmPartResult:
     # (X=0 always, regardless of parameter values), unlike the old U shape
     # which needed u_arm_height tuned to a specific value for that.
     collar_end_z = p.ROD_THREADED_LENGTH_MM + p.COLLAR_LENGTH_MM
+    cradle_start_z = collar_end_z + p.CRADLE_TRANSITION_HEIGHT_MM
     u_block_x_extent = 2 * p.U_WALL_THICKNESS_MM + p.U_INTERNAL_WIDTH_MM
     u_block_z_depth = p.U_WALL_THICKNESS_MM + p.U_ARM_HEIGHT_MM
-    u_gap_z_start = collar_end_z + p.U_WALL_THICKNESS_MM
+    u_gap_z_start = cradle_start_z + p.U_WALL_THICKNESS_MM
 
     with BuildPart() as builder:
+        with Locations(Location((0, 0, cradle_start_z))):
+            Box(
+                u_block_x_extent,
+                p.U_ARM_LENGTH_MM,
+                u_block_z_depth,
+                align=(Align.CENTER, Align.CENTER, Align.MIN),
+            )
+        vertical_edges = builder.edges().filter_by(Axis.Z)
+        fillet(vertical_edges, radius=p.CRADLE_CORNER_FILLET_RADIUS_MM)
+
         Cylinder(
             radius=core_radius,
             height=p.ROD_THREADED_LENGTH_MM,
@@ -237,13 +262,17 @@ def build_arm_part() -> ArmPartResult:
                 align=(Align.CENTER, Align.CENTER, Align.MIN),
             )
 
-        with Locations(Location((0, 0, collar_end_z))):
-            Box(
-                u_block_x_extent,
-                p.U_ARM_LENGTH_MM,
-                u_block_z_depth,
-                align=(Align.CENTER, Align.CENTER, Align.MIN),
-            )
+        # Smooth loft transition: a circle matching the collar's top face
+        # blends into a rounded rectangle matching the cradle block's own
+        # (already-filleted) bottom cross-section — same fillet radius on
+        # both ends, so the two solids meet without a seam or step. See
+        # decisions.md for the self-supporting angle this achieves (~42.4°,
+        # measured directly on the built solid).
+        with BuildSketch(Plane.XY.offset(collar_end_z)) as transition_bottom:
+            Circle(p.COLLAR_DIAMETER_MM / 2)
+        with BuildSketch(Plane.XY.offset(cradle_start_z)) as transition_top:
+            RectangleRounded(u_block_x_extent, p.U_ARM_LENGTH_MM, p.CRADLE_CORNER_FILLET_RADIUS_MM)
+        loft([transition_bottom.sketch.faces()[0], transition_top.sketch.faces()[0]])
 
         with Locations(Location((0, 0, u_gap_z_start))):
             Box(
@@ -280,6 +309,8 @@ def build_arm_part() -> ArmPartResult:
         rod_threaded_length_mm=p.ROD_THREADED_LENGTH_MM,
         collar_diameter_mm=p.COLLAR_DIAMETER_MM,
         collar_length_mm=p.COLLAR_LENGTH_MM,
+        cradle_transition_height_mm=p.CRADLE_TRANSITION_HEIGHT_MM,
+        cradle_corner_fillet_radius_mm=p.CRADLE_CORNER_FILLET_RADIUS_MM,
         u_internal_width_mm=p.U_INTERNAL_WIDTH_MM,
         u_arm_length_mm=p.U_ARM_LENGTH_MM,
         u_wall_thickness_mm=p.U_WALL_THICKNESS_MM,

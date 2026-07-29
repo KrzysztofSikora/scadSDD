@@ -37,6 +37,7 @@ def test_thread_engagement_maintained_at_max_extension():
         p.MOUNTING_PLATE_THICKNESS_MM
         + p.NUT_BOSS_LENGTH_MM
         + p.COLLAR_LENGTH_MM
+        + p.CRADLE_TRANSITION_HEIGHT_MM
         + p.U_WALL_THICKNESS_MM
         + p.BARREL_DIAMETER_REFERENCE_MM / 2
     )
@@ -64,6 +65,7 @@ def test_adjustment_range_matches_spec():
         p.MOUNTING_PLATE_THICKNESS_MM
         + p.NUT_BOSS_LENGTH_MM
         + p.COLLAR_LENGTH_MM
+        + p.CRADLE_TRANSITION_HEIGHT_MM
         + p.U_WALL_THICKNESS_MM
         + p.BARREL_DIAMETER_REFERENCE_MM / 2
     )

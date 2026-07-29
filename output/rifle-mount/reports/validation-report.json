@@ -1,8 +1,8 @@
 {
   "status": "passed",
-  "spec_version": "1.0.0",
+  "spec_version": "2.0.0",
   "model_id": "magnetic-rifle-mount-001",
-  "generated_at": "2026-07-29T09:45:18.372823+00:00",
+  "generated_at": "2026-07-29T10:19:48.695609+00:00",
   "parts": {
     "base": {
       "model": {
@@ -51,18 +51,18 @@
       "model": {
         "solid_count": 1,
         "is_valid": true,
-        "volume_mm3": 74791.3503856568,
-        "surface_area_mm2": 24235.700019571053,
+        "volume_mm3": 75278.60591095446,
+        "surface_area_mm2": 22344.596999283673,
         "bounding_box_mm": {
-          "x": 42.0,
-          "y": 40.0,
-          "z": 154.0000001
+          "x": 42.00000020000001,
+          "y": 40.00000021973591,
+          "z": 159.5000001
         },
-        "mass_kg": 0.20193664604127334
+        "mass_kg": 0.20325223595957703
       },
       "features": {
         "rod_threaded_length_mm": 112.0,
-        "collar_diameter_mm": 27.0,
+        "collar_diameter_mm": 32.0,
         "u_internal_width_mm": 30.0,
         "u_arm_length_mm": 40.0,
         "thread": {
@@ -124,7 +124,7 @@
       "id": "arm_volume_positive",
       "description": "Bry\u0142a 'arm' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
       "expected": "> 0",
-      "actual": 74791.3503856568,
+      "actual": 75278.60591095446,
       "tolerance": null,
       "status": "passed",
       "message": ""
@@ -168,8 +168,8 @@
     {
       "id": "collar_diameter",
       "description": "\u015arednica ko\u0142nierza oporowego zgodna ze specyfikacj\u0105.",
-      "expected": 27.0,
-      "actual": 27.0,
+      "expected": 32.0,
+      "actual": 32.0,
       "tolerance": 0.1,
       "status": "passed",
       "message": ""
@@ -180,6 +180,24 @@
       "expected": 112.0,
       "actual": 112.0,
       "tolerance": 0.3,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "cradle_transition_height",
+      "description": "Wysoko\u015b\u0107 \u0142agodnego przej\u015bcia ko\u0142nierz -> chwyt C zgodna ze specyfikacj\u0105.",
+      "expected": 5.5,
+      "actual": 5.5,
+      "tolerance": 0.2,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "cradle_corner_fillet_radius",
+      "description": "Promie\u0144 zaokr\u0105glenia naro\u017cnik\u00f3w bloku chwytu C zgodny ze specyfikacj\u0105.",
+      "expected": 19.0,
+      "actual": 19.0,
+      "tolerance": 0.2,
       "status": "passed",
       "message": ""
     },
@@ -206,7 +224,7 @@
       "id": "thread_engagement_at_max_extension",
       "description": "Zaz\u0119bienie gwintu przy maksymalnym wysuni\u0119ciu (140mm) nie spada poni\u017cej thread_engagement_length.",
       "expected": ">= 40.0",
-      "actual": 46.0,
+      "actual": 51.5,
       "tolerance": null,
       "status": "passed",
       "message": ""

@@ -142,6 +142,20 @@ def _arm_feature_checks(features: ArmFeatures) -> list[ValidationCheck]:
             features.rod_threaded_length_mm,
             p.tolerance_for("rod_threaded_length"),
         ),
+        _dimension_check(
+            "cradle_transition_height",
+            "Wysokość łagodnego przejścia kołnierz -> chwyt C zgodna ze specyfikacją.",
+            p.CRADLE_TRANSITION_HEIGHT_MM,
+            features.cradle_transition_height_mm,
+            p.tolerance_for("cradle_transition_height"),
+        ),
+        _dimension_check(
+            "cradle_corner_fillet_radius",
+            "Promień zaokrąglenia narożników bloku chwytu C zgodny ze specyfikacją.",
+            p.CRADLE_CORNER_FILLET_RADIUS_MM,
+            features.cradle_corner_fillet_radius_mm,
+            p.tolerance_for("cradle_corner_fillet_radius"),
+        ),
     ]
 
 
@@ -177,6 +191,7 @@ def _thread_engagement_range_check() -> ValidationCheck:
         p.MOUNTING_PLATE_THICKNESS_MM
         + p.NUT_BOSS_LENGTH_MM
         + p.COLLAR_LENGTH_MM
+        + p.CRADLE_TRANSITION_HEIGHT_MM
         + p.U_WALL_THICKNESS_MM
         + p.BARREL_DIAMETER_REFERENCE_MM / 2
     )

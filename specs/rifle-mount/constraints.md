@@ -63,3 +63,33 @@ nie zmienia tolerancji żeby przepchnąć walidację, itd.
   na w pełni niezawodnej analizie topologicznej gwintu (topologia gwintu
   helikalnego jest znacznie bardziej złożona niż proste otwory
   cylindryczne).
+
+## Znane ograniczenia i decyzje o zakresie (v2)
+
+* **Margines wysuwu przy minimalnej odległości jest bardzo mały (0.5mm).**
+  Dodanie w v2 łagodnego, drukowalnego-bez-podpór przejścia między
+  kołnierzem a chwytem C (`cradle_transition_height` = 5.5mm) wykorzystuje
+  niemal cały zapas, jaki istniał między `fixed_offset` a
+  `wall_to_barrel_center_min` (patrz `specs/rifle-mount/decisions.md`, "v2
+  — łagodne przejście C/gwint"). Przy w pełni wkręconym mechanizmie (80mm)
+  wysuw trzpienia poza tuleją wynosi tylko ~0.5mm — technicznie dodatnie
+  (spełnia `check_engineering_preconditions()`), ale praktycznie oznacza
+  zerowy zapas na tolerancje wydruku. Użytkownik świadomie wybrał
+  zachowanie dokładnego zakresu 80–140mm zamiast wygodniejszego marginesu
+  (opcja podniesienia minimum została przedstawiona i odrzucona) — to
+  świadome ograniczenie zakresu v2, nie błąd.
+* **Luz między kołnierzem a czołem tulei zmniejszony do ~0.5mm promienia.**
+  `collar_diameter` powiększono z 27mm do 32mm (v2), żeby skrócić wymaganą
+  wysokość przejścia — zostaje ~1mm luzu na średnicy (0.5mm promienia) do
+  `nut_boss_outer_diameter` (33mm). Wystarczające dla druku FDM przy
+  typowych tolerancjach (rzędu ±0.1–0.3mm na wymiar), ale ciaśniejsze niż
+  pozostałe pasowania w tym modelu — warte uwagi przy ewentualnej dalszej
+  zmianie `nut_wall_thickness` lub `thread_major_diameter`.
+* **Kąt narostu przejścia (~42.4°) ma tylko ~2.6° zapasu do progu 45°.**
+  Wartość progu 45° to standardowe (nie zmierzone materiałowo) założenie
+  o granicy samo-podpierania w druku FDM — różne materiały/drukarki mogą
+  tolerować więcej lub mniej. Jeśli w praktyce dany model drukarki/materiał
+  wymaga mniejszego kąta, może być konieczne dalsze zmniejszenie nawisu
+  (większy `collar_diameter` lub inny kształt bloku C) kosztem jeszcze
+  mniejszego marginesu przy minimalnym wysuwie — a to już koliduje z
+  zachowaniem dokładnego zakresu 80–140mm (patrz punkt wyżej).

@@ -49,8 +49,11 @@ def test_magnet_edge_offset(built_result):
 
 def test_arm_bounding_box_length(built_result):
     measurements = measure(built_result.arm.part)
-    expected_length = p.ROD_THREADED_LENGTH_MM + p.COLLAR_LENGTH_MM + (
-        p.U_WALL_THICKNESS_MM + p.U_ARM_HEIGHT_MM
+    expected_length = (
+        p.ROD_THREADED_LENGTH_MM
+        + p.COLLAR_LENGTH_MM
+        + p.CRADLE_TRANSITION_HEIGHT_MM
+        + (p.U_WALL_THICKNESS_MM + p.U_ARM_HEIGHT_MM)
     )
     assert measurements.bounding_box_mm.z_mm == pytest.approx(expected_length, abs=0.2)
 
@@ -64,6 +67,18 @@ def test_arm_u_internal_width_matches_spec(built_result):
 def test_arm_collar_diameter_matches_spec(built_result):
     assert built_result.arm.features.collar_diameter_mm == pytest.approx(
         p.COLLAR_DIAMETER_MM, abs=p.tolerance_for("collar_diameter")
+    )
+
+
+def test_arm_cradle_transition_height_matches_spec(built_result):
+    assert built_result.arm.features.cradle_transition_height_mm == pytest.approx(
+        p.CRADLE_TRANSITION_HEIGHT_MM, abs=p.tolerance_for("cradle_transition_height")
+    )
+
+
+def test_arm_cradle_corner_fillet_radius_matches_spec(built_result):
+    assert built_result.arm.features.cradle_corner_fillet_radius_mm == pytest.approx(
+        p.CRADLE_CORNER_FILLET_RADIUS_MM, abs=p.tolerance_for("cradle_corner_fillet_radius")
     )
 
 

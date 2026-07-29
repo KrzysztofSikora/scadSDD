@@ -55,6 +55,8 @@ _REQUIRED_PARAMETER_IDS = {
     "rod_threaded_length",
     "collar_length",
     "collar_diameter",
+    "cradle_transition_height",
+    "cradle_corner_fillet_radius",
     "u_internal_width",
     "u_arm_length",
     "u_arm_height",
@@ -176,6 +178,8 @@ NUT_BOSS_LENGTH_MM: float = _PARAMETERS["nut_boss_length"].value
 ROD_THREADED_LENGTH_MM: float = _PARAMETERS["rod_threaded_length"].value
 COLLAR_LENGTH_MM: float = _PARAMETERS["collar_length"].value
 COLLAR_DIAMETER_MM: float = _PARAMETERS["collar_diameter"].value
+CRADLE_TRANSITION_HEIGHT_MM: float = _PARAMETERS["cradle_transition_height"].value
+CRADLE_CORNER_FILLET_RADIUS_MM: float = _PARAMETERS["cradle_corner_fillet_radius"].value
 U_INTERNAL_WIDTH_MM: float = _PARAMETERS["u_internal_width"].value
 U_ARM_LENGTH_MM: float = _PARAMETERS["u_arm_length"].value
 U_ARM_HEIGHT_MM: float = _PARAMETERS["u_arm_height"].value
@@ -275,16 +279,65 @@ def check_engineering_preconditions() -> None:
             f"smaller than u_wall_thickness ({U_WALL_THICKNESS_MM} mm)."
         )
 
+    # v2: the C-cradle block's outer footprint (see model.py) is a
+    # rectangle u_block_x_extent x u_arm_length with its 4 vertical edges
+    # rounded by cradle_corner_fillet_radius. A box fillet radius must stay
+    # strictly below half of either adjacent face dimension, or the fillet
+    # is geometrically impossible - see specs/rifle-mount/decisions.md
+    # ("v2 - łagodne przejście C/gwint").
+    u_block_x_extent = 2 * U_WALL_THICKNESS_MM + U_INTERNAL_WIDTH_MM
+    half_x = u_block_x_extent / 2
+    half_y = U_ARM_LENGTH_MM / 2
+    if min(half_x, half_y) <= CRADLE_CORNER_FILLET_RADIUS_MM:
+        raise SpecificationError(
+            "Inconsistent specification: cradle_corner_fillet_radius "
+            f"({CRADLE_CORNER_FILLET_RADIUS_MM} mm) must be smaller than half of the "
+            f"C-cradle block's shorter footprint dimension ({min(half_x, half_y)} mm), "
+            "otherwise the corner fillet is geometrically impossible."
+        )
+
+    # v2: the smooth loft transition between the collar and the (rounded)
+    # C-cradle block must stay within the standard FDM self-supporting
+    # overhang angle (45 deg from vertical), so the arm prints without
+    # support material - see specs/rifle-mount/decisions.md ("v2 - łagodne
+    # przejście C/gwint"). The worst case is the block's rounded corner,
+    # at distance hypot(half_x - r, half_y - r) + r from the axis; this
+    # analytic formula is a conservative (slightly larger) upper bound on
+    # the actual lofted geometry, confirmed by direct measurement of the
+    # built solid (measured ~21.0mm vs ~21.24mm analytic here).
+    max_cradle_radial_extent = (
+        math.hypot(
+            half_x - CRADLE_CORNER_FILLET_RADIUS_MM,
+            half_y - CRADLE_CORNER_FILLET_RADIUS_MM,
+        )
+        + CRADLE_CORNER_FILLET_RADIUS_MM
+    )
+    transition_overhang = max_cradle_radial_extent - COLLAR_DIAMETER_MM / 2
+    if transition_overhang > 0:
+        transition_angle_deg = math.degrees(
+            math.atan(transition_overhang / CRADLE_TRANSITION_HEIGHT_MM)
+        )
+        if transition_angle_deg > 45.0:
+            raise SpecificationError(
+                "Inconsistent specification: the collar -> C-cradle transition overhang "
+                f"angle ({transition_angle_deg:.1f} deg) exceeds the 45 deg self-supporting "
+                "threshold for FDM printing without support material. Increase "
+                "cradle_transition_height, increase collar_diameter, or decrease the "
+                "C-cradle block's footprint/fillet radius."
+            )
+
     # The C cradle's barrel rests against its back wall (adjacent to the
     # collar), so the barrel's center sits at u_wall_thickness (back wall)
     # + barrel_diameter_reference/2 past the start of the cradle block. See
     # specs/rifle-mount/decisions.md ("U -> C cradle reorientation") — this
     # must match src/cad_project/rifle_mount/model.py's u_gap_z_start
-    # exactly.
+    # exactly. v2 adds cradle_transition_height as a new fixed (non-adjustable)
+    # component - see decisions.md ("v2 - łagodne przejście C/gwint").
     fixed_offset = (
         MOUNTING_PLATE_THICKNESS_MM
         + NUT_BOSS_LENGTH_MM
         + COLLAR_LENGTH_MM
+        + CRADLE_TRANSITION_HEIGHT_MM
         + U_WALL_THICKNESS_MM
         + BARREL_DIAMETER_REFERENCE_MM / 2
     )
