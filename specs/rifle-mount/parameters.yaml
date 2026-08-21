@@ -14,19 +14,22 @@
 project:
   name: "Magnetic Rifle Barrel Mount"
   model_id: "magnetic-rifle-mount-001"
-  spec_version: "2.0.0"
+  spec_version: "2.1.0"
   units: "mm"
 
 parameters:
   - id: wall_to_barrel_center_min
     name: "Minimalna odległość ścianka -> środek lufy"
-    value: 80.0
+    value: 86.0
     unit: mm
     tolerance: 0.3
     description: >
       Minimalna odległość od ścianki sejfu (powierzchni stykającej się z
       magnesami) do środka lufy spoczywającej w chwycie C, przy
-      maksymalnie wkręconym mechanizmie regulacji.
+      maksymalnie wkręconym mechanizmie regulacji. Podniesione z 80.0mm do
+      86.0mm w v2.1, żeby zrobić miejsce na bardziej masywną (grubszą)
+      tylną ściankę chwytu C — patrz specs/rifle-mount/decisions.md
+      ("v2.1 — masywniejszy chwyt C").
 
   - id: wall_to_barrel_center_max
     name: "Maksymalna odległość ścianka -> środek lufy"
@@ -198,7 +201,7 @@ parameters:
 
   - id: cradle_transition_height
     name: "Wysokość łagodnego przejścia kołnierz -> chwyt C"
-    value: 5.5
+    value: 8.5
     unit: mm
     tolerance: 0.2
     description: >
@@ -208,8 +211,11 @@ parameters:
       a blokiem chwytu C. Dodane w v2, żeby wyeliminować nagły, 90-stopniowy
       nawis (wcześniej ~15.5mm) i umożliwić druk 3D bez podpór — patrz
       specs/rifle-mount/decisions.md "v2 — łagodne przejście C/gwint" po
-      pełne wyprowadzenie kąta narostu (~42.4°, zmierzone bezpośrednio na
-      geometrii, poniżej progu samo-podpierania 45°).
+      pełne wyprowadzenie kąta narostu. Wydłużone z 5.5mm do 8.5mm w v2.1,
+      razem ze zwiększeniem u_wall_thickness (grubszy blok chwytu C ma
+      większy gabaryt promieniowy, więc wymaga wyższego przejścia, żeby
+      kąt narostu pozostał ≤45°) — patrz decisions.md ("v2.1 — masywniejszy
+      chwyt C").
 
   - id: cradle_corner_fillet_radius
     name: "Promień zaokrąglenia narożników bloku chwytu C"
@@ -252,20 +258,29 @@ parameters:
       Głębokość otwartej części chwytu wzdłuż osi trzpienia, licząc od
       wewnętrznej powierzchni tylnej ścianki (o którą opiera się lufa) do
       czoła ramienia — chwyt jest otwarty na tym końcu (z dala od
-      kołnierza/ściany), nie od góry. Wartość (=u_wall_thickness +
-      barrel_diameter_reference) dobrana tak, by lufa referencyjna
-      mieściła się dokładnie w tej głębokości, stykając się z tylną
-      ścianką. Współosiowość z osią trzpienia jest teraz zapewniona
-      konstrukcyjnie (symetryczny prześwit u_internal_width wzdłuż osi
-      prostopadłej), nie przez dobór tej wartości — patrz
-      specs/rifle-mount/decisions.md ("U -> C cradle reorientation").
+      kołnierza/ściany), nie od góry. Pierwotnie (v2 i wcześniej) wartość
+      odpowiadała liczbowo u_wall_thickness + barrel_diameter_reference
+      (6+20=26), tak by lufa referencyjna kończyła się dokładnie równo z
+      otwartym czołem ramienia. Po zwiększeniu u_wall_thickness do 9.0mm w
+      v2.1 ta formuła już się nie zgadza (9+20=29 ≠ 26) — świadomie
+      pozostawione bez zmian (lufa nadal mieści się swobodnie w tej
+      głębokości, tylko już nie dokładnie równo z czołem, ~3mm wcięta) —
+      patrz specs/rifle-mount/decisions.md ("v2.1 — masywniejszy chwyt C").
+      Współosiowość z osią trzpienia jest zapewniona konstrukcyjnie
+      (symetryczny prześwit u_internal_width wzdłuż osi prostopadłej), nie
+      przez dobór tej wartości — patrz specs/rifle-mount/decisions.md
+      ("U -> C cradle reorientation").
 
   - id: u_wall_thickness
     name: "Grubość ścianek chwytu C"
-    value: 6.0
+    value: 9.0
     unit: mm
     tolerance: 0.2
-    description: Grubość tylnej ścianki (oporu) i bocznych ramion chwytu C.
+    description: >
+      Grubość tylnej ścianki (oporu) i bocznych ramion chwytu C. Zwiększone
+      z 6.0mm do 9.0mm w v2.1 na wyraźne polecenie użytkownika, żeby
+      element podpierający lufę był bardziej masywny — patrz
+      specs/rifle-mount/decisions.md ("v2.1 — masywniejszy chwyt C").
 
   - id: liner_groove_width
     name: "Szerokość rowka na wkładkę filcową"

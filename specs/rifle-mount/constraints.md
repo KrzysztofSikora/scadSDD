@@ -68,16 +68,16 @@ nie zmienia tolerancji żeby przepchnąć walidację, itd.
 
 * **Margines wysuwu przy minimalnej odległości jest bardzo mały (0.5mm).**
   Dodanie w v2 łagodnego, drukowalnego-bez-podpór przejścia między
-  kołnierzem a chwytem C (`cradle_transition_height` = 5.5mm) wykorzystuje
-  niemal cały zapas, jaki istniał między `fixed_offset` a
+  kołnierzem a chwytem C (`cradle_transition_height`) wykorzystuje niemal
+  cały zapas, jaki istniał między `fixed_offset` a
   `wall_to_barrel_center_min` (patrz `specs/rifle-mount/decisions.md`, "v2
-  — łagodne przejście C/gwint"). Przy w pełni wkręconym mechanizmie (80mm)
-  wysuw trzpienia poza tuleją wynosi tylko ~0.5mm — technicznie dodatnie
+  — łagodne przejście C/gwint"). Przy w pełni wkręconym mechanizmie wysuw
+  trzpienia poza tuleją wynosi tylko ~0.5mm — technicznie dodatnie
   (spełnia `check_engineering_preconditions()`), ale praktycznie oznacza
   zerowy zapas na tolerancje wydruku. Użytkownik świadomie wybrał
-  zachowanie dokładnego zakresu 80–140mm zamiast wygodniejszego marginesu
-  (opcja podniesienia minimum została przedstawiona i odrzucona) — to
-  świadome ograniczenie zakresu v2, nie błąd.
+  zachowanie tego marginesu identycznym (dokładnie 0.5mm) w v2 i ponownie
+  w v2.1 zamiast wygodniejszego marginesu — to świadome, powtórzone
+  ograniczenie zakresu, nie błąd.
 * **Luz między kołnierzem a czołem tulei zmniejszony do ~0.5mm promienia.**
   `collar_diameter` powiększono z 27mm do 32mm (v2), żeby skrócić wymaganą
   wysokość przejścia — zostaje ~1mm luzu na średnicy (0.5mm promienia) do
@@ -85,11 +85,34 @@ nie zmienia tolerancji żeby przepchnąć walidację, itd.
   typowych tolerancjach (rzędu ±0.1–0.3mm na wymiar), ale ciaśniejsze niż
   pozostałe pasowania w tym modelu — warte uwagi przy ewentualnej dalszej
   zmianie `nut_wall_thickness` lub `thread_major_diameter`.
-* **Kąt narostu przejścia (~42.4°) ma tylko ~2.6° zapasu do progu 45°.**
+* **Kąt narostu przejścia ma niewielki zapas do progu 45°.**
   Wartość progu 45° to standardowe (nie zmierzone materiałowo) założenie
   o granicy samo-podpierania w druku FDM — różne materiały/drukarki mogą
   tolerować więcej lub mniej. Jeśli w praktyce dany model drukarki/materiał
   wymaga mniejszego kąta, może być konieczne dalsze zmniejszenie nawisu
   (większy `collar_diameter` lub inny kształt bloku C) kosztem jeszcze
   mniejszego marginesu przy minimalnym wysuwie — a to już koliduje z
-  zachowaniem dokładnego zakresu 80–140mm (patrz punkt wyżej).
+  zachowaniem dokładnego zakresu regulacji (patrz punkt wyżej).
+
+## Znane ograniczenia i decyzje o zakresie (v2.1)
+
+* **Zakres regulacji nie jest już równy 8–14cm.** Pogrubienie
+  `u_wall_thickness` (6→9mm, na wyraźne polecenie użytkownika, dla
+  bardziej masywnego podparcia lufy) wymagało podniesienia
+  `wall_to_barrel_center_min` z 80mm do 86mm, żeby zachować dodatni zapas
+  wysuwu trzpienia i kąt nawisu przejścia ≤45° — patrz
+  `specs/rifle-mount/decisions.md` ("v2.1 — masywniejszy chwyt C"). Nowy
+  zakres to 86–140mm; opcja zachowania dokładnie 80mm kosztem innego
+  kompromisu (skrócenie `collar_length` lub `cradle_transition_height`)
+  została przedstawiona i odrzucona przez użytkownika na rzecz podniesienia
+  dolnej granicy.
+* **`u_arm_height` (26mm) nie zostało przeliczone razem z
+  `u_wall_thickness`.** Wcześniej (v2) liczbowo odpowiadało
+  `u_wall_thickness + barrel_diameter_reference`, tak by lufa referencyjna
+  kończyła się równo z otwartym czołem ramienia — po zwiększeniu
+  `u_wall_thickness` do 9mm ta zbieżność liczbowa już nie zachodzi (lufa
+  kończy się ~3mm przed czołem ramienia zamiast dokładnie na czole).
+  Świadomie pozostawione bez zmian, bo nie było to przedmiotem żądania
+  użytkownika i nie jest wymogiem sprawdzanym przez
+  `check_engineering_preconditions()` — czysto kosmetyczna/funkcjonalna
+  różnica, nie błąd konstrukcyjny.

@@ -1,8 +1,8 @@
 {
   "status": "passed",
-  "spec_version": "2.0.0",
+  "spec_version": "2.1.0",
   "model_id": "magnetic-rifle-mount-001",
-  "generated_at": "2026-07-29T10:19:48.695609+00:00",
+  "generated_at": "2026-08-21T12:15:43.335201+00:00",
   "parts": {
     "base": {
       "model": {
@@ -51,14 +51,14 @@
       "model": {
         "solid_count": 1,
         "is_valid": true,
-        "volume_mm3": 75278.60591095446,
-        "surface_area_mm2": 22344.596999283673,
+        "volume_mm3": 90718.81167813145,
+        "surface_area_mm2": 24185.72764158873,
         "bounding_box_mm": {
-          "x": 42.00000020000001,
+          "x": 48.00000020000001,
           "y": 40.00000021973591,
-          "z": 159.5000001
+          "z": 165.5000001
         },
-        "mass_kg": 0.20325223595957703
+        "mass_kg": 0.2449407915309549
       },
       "features": {
         "rod_threaded_length_mm": 112.0,
@@ -124,7 +124,7 @@
       "id": "arm_volume_positive",
       "description": "Bry\u0142a 'arm' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
       "expected": "> 0",
-      "actual": 75278.60591095446,
+      "actual": 90718.81167813145,
       "tolerance": null,
       "status": "passed",
       "message": ""
@@ -186,8 +186,8 @@
     {
       "id": "cradle_transition_height",
       "description": "Wysoko\u015b\u0107 \u0142agodnego przej\u015bcia ko\u0142nierz -> chwyt C zgodna ze specyfikacj\u0105.",
-      "expected": 5.5,
-      "actual": 5.5,
+      "expected": 8.5,
+      "actual": 8.5,
       "tolerance": 0.2,
       "status": "passed",
       "message": ""
@@ -224,7 +224,7 @@
       "id": "thread_engagement_at_max_extension",
       "description": "Zaz\u0119bienie gwintu przy maksymalnym wysuni\u0119ciu (140mm) nie spada poni\u017cej thread_engagement_length.",
       "expected": ">= 40.0",
-      "actual": 51.5,
+      "actual": 57.5,
       "tolerance": null,
       "status": "passed",
       "message": ""

@@ -382,3 +382,104 @@ użytkownika (łagodne przejście bez podpór), z liczbami wyprowadzonymi i
 zmierzonymi (nie zgadniętymi) oraz z jawnym pytaniem do użytkownika w
 punkcie, gdzie wymagania (dokładny zakres 80–140mm) i inżynieria
 (potrzebna wysokość przejścia) się ze sobą ścierały.
+
+## 2026-08-21 — v2.1: masywniejszy chwyt C (na wyraźne polecenie użytkownika)
+
+**Żądanie użytkownika**: element chwytu C, na którym opiera się lufa
+(tylna ścianka + ramiona boczne, `u_wall_thickness`), ma być bardziej
+masywny, żeby lepiej podpierać lufę. Wyraźnie wykluczone: wydłużanie
+gwintu/tulei/trzpienia (`thread_engagement_length`, `nut_boss_length`,
+`rod_threaded_length` — bez zmian).
+
+**Konflikt wykryty i przedstawiony użytkownikowi przed zmianą**:
+`u_wall_thickness` wchodzi wprost do `fixed_offset`
+(`src/cad_project/rifle_mount/parameters.py::check_engineering_preconditions`),
+a zapas wysuwu przy minimalnej odległości (`exposed_min`) w v2 wynosił
+tylko 0.5mm — każde zwiększenie `u_wall_thickness` o więcej niż to
+łamałoby `wall_to_barrel_center_min` = 80mm. Dodatkowo, niezależnie od
+tego, powiększenie gabarytu bloku chwytu C (przez grubszą ściankę)
+zwiększa promieniowy nawis przejścia kołnierz→chwyt C, co przy
+niezmienionym `cradle_transition_height` łamałoby próg 45° samo-podpierania
+z v2 (przy `u_wall_thickness`=9mm bez innych zmian: kąt analityczny
+~55.9°). Oba konflikty przedstawiono użytkownikowi wprost, z konkretnymi
+liczbami, zamiast zgadywać rozwiązanie.
+
+**Wybrane rozwiązanie** (spośród przedstawionych opcji, wybrane przez
+użytkownika): podnieść `wall_to_barrel_center_min`, zamiast skracać
+`collar_length` lub próbować zmieścić się w istniejącym zapasie.
+
+**Docelowa wartość `u_wall_thickness`**: 6.0mm → **9.0mm** (+50%, wybrane
+przez użytkownika spośród przedstawionych opcji +25%/+50%/własna wartość).
+
+**Wyprowadzenie `cradle_transition_height`** (musi rosnąć razem z
+`u_wall_thickness`, żeby kąt nawisu pozostał ≤45°):
+```
+half_x = u_wall_thickness + u_internal_width/2 = 9 + 15 = 24mm
+half_y = u_arm_length/2 = 20mm  (bez zmian, u_arm_length nietknięte)
+r = cradle_corner_fillet_radius = 19mm  (bez zmian)
+
+max_cradle_radial_extent = hypot(half_x - r, half_y - r) + r
+                          = hypot(24-19, 20-19) + 19
+                          = hypot(5, 1) + 19 ≈ 24.10mm
+
+transition_overhang = max_cradle_radial_extent - collar_diameter/2
+                     = 24.10 - 16 = 8.10mm
+```
+Żeby zachować podobny margines bezpieczeństwa do progu 45° jak w
+oryginalnej decyzji v2 (tam: zapas analityczny ~1.4°, zmierzony ~2.6°),
+przyjęto **`cradle_transition_height` = 8.5mm** (zamiast minimalnego
+8.10mm, które dawałoby dokładnie 45° bez żadnego zapasu):
+```
+transition_angle_deg = atan(8.10 / 8.5) ≈ 43.6°   (zapas analityczny ~1.4°)
+```
+Zgodnie z relacją z v2 (analityczna wartość jest konserwatywnym górnym
+oszacowaniem), rzeczywisty kąt wyszedł korzystniej niż 43.6° analityczne.
+
+**Zmierzone bezpośrednio na zbudowanej geometrii** (ta sama metoda co w
+v2: próbkowanie przekrojów `arm.intersect(cienki_box)` co 0.5mm wysokości
+od szczytu kołnierza do startu bloku C): promień rósł monotonicznie od
+16.005mm (kołnierz) do 24.000mm (szczyt przejścia), dając kąt narostu
+**~43.25°** — zapas **~1.75°** do progu 45°, potwierdzone przed wpisaniem
+do specyfikacji (nie zgadnięte — patrz `.claude/CLAUDE.md`).
+
+**Wyprowadzenie `wall_to_barrel_center_min`** (nowy `fixed_offset`):
+```
+fixed_offset = mounting_plate_thickness + nut_boss_length + collar_length
+             + cradle_transition_height + u_wall_thickness
+             + barrel_diameter_reference/2
+             = 4 + 44 + 10 + 8.5 + 9 + 10 = 85.5mm
+
+wall_to_barrel_center_min = fixed_offset + 0.5mm (ten sam zapas co w v2)
+                           = 86.0mm
+```
+`wall_to_barrel_center_max` (140mm) pozostaje bez zmian — użytkownik nie
+prosił o zmianę górnej granicy, a `rod_threaded_length` (112mm, bez zmian)
+ma z nią jeszcze więcej zapasu niż w v2 (17.5mm zamiast 11.5mm), bo
+maksymalny wysuw trzpienia się skrócił (140-85.5=54.5mm zamiast
+140-79.5=60.5mm).
+
+**Konsekwencja dla `u_arm_height`**: parametr ten (26mm, głębokość otwarcia
+chwytu wzdłuż osi trzpienia) numerycznie odpowiadał w v2 formule
+`u_wall_thickness + barrel_diameter_reference` (6+20=26), tak by lufa
+referencyjna kończyła się dokładnie równo z otwartym czołem ramienia. Po
+zmianie `u_wall_thickness` na 9mm ta zbieżność (9+20=29≠26) już nie
+zachodzi. Świadomie pozostawione bez zmian — nie było przedmiotem żądania
+użytkownika, nie jest wymogiem sprawdzanym przez
+`check_engineering_preconditions()`, a jedyny efekt to lufa kończąca się
+~3mm przed czołem ramienia zamiast dokładnie na czole (kosmetyczne, nie
+funkcjonalne pogorszenie — lufa nadal swobodnie mieści się w otwarciu,
+26mm > 20mm średnicy referencyjnej).
+
+**Odrzucone alternatywy**: (a) zostawić `wall_to_barrel_center_min` na
+80mm i skrócić `collar_length` i/lub `cradle_transition_height` zamiast —
+odrzucone przez użytkownika na rzecz podniesienia dolnej granicy zakresu;
+(b) mniejszy przyrost `u_wall_thickness` (+25% → 7.5mm) — odrzucone,
+użytkownik wybrał +50%.
+
+**Uzasadnienie całości**: zmiana geometrii na wyraźne życzenie użytkownika
+(bardziej masywne podparcie lufy), z pełnym ujawnieniem użytkownikowi
+dwóch niezależnych konfliktów inżynieryjnych (zapas wysuwu przy minimum,
+kąt nawisu przejścia) przed wprowadzeniem jakiejkolwiek zmiany w
+`specs/`, i z liczbami wyprowadzonymi analitycznie (nie zgadniętymi) —
+zgodnie z `.claude/CLAUDE.md` ("Gdy specyfikacja jest niepełna lub
+sprzeczna").
