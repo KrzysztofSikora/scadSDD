@@ -11,7 +11,7 @@
 |------------------------|-----------------------------------|
 | Nazwa projektu        | Magnetic Rifle Barrel Mount       |
 | Identyfikator modelu  | `magnetic-rifle-mount-001`        |
-| Wersja specyfikacji   | `2.1.0`                           |
+| Wersja specyfikacji   | `2.2.0`                           |
 | Jednostki             | milimetry (mm)                    |
 
 **Iteracja 2 (v2)**: zachowuje zakres regulacji 80–140mm z v1 bez zmian
@@ -20,7 +20,7 @@ między kołnierzem a chwytem C — patrz "Geometria" niżej oraz
 `specs/rifle-mount/decisions.md` ("v2 — łagodne przejście C/gwint") po
 pełne uzasadnienie i wyprowadzenie liczb.
 
-**Iteracja 3 (v2.1, ta wersja)**: pogrubia ściankę/ramiona chwytu C
+**Iteracja 3 (v2.1)**: pogrubia ściankę/ramiona chwytu C
 (`u_wall_thickness` 6→9mm) na wyraźne polecenie użytkownika, żeby element
 podpierający lufę był bardziej masywny. Wymagało to podniesienia dolnej
 granicy zakresu regulacji (`wall_to_barrel_center_min` 80→86mm) i
@@ -30,6 +30,14 @@ grubsza ścianka zwiększa gabaryt bloku chwytu C i tym samym stały
 patrz `specs/rifle-mount/decisions.md` ("v2.1 — masywniejszy chwyt C") po
 pełne wyprowadzenie liczb. Zakres regulacji **nie jest już** dokładnie
 8–14cm (teraz 86–140mm) — świadomy kompromis wybrany przez użytkownika.
+
+**Iteracja 4 (v2.2, ta wersja)**: odwraca kierunek wiercenia kieszeni na
+magnesy w Części A — do v2.1 były wiercone od strony wewnętrznej płyty
+(ścianka `magnet_pocket_wall_thickness` zostawała od strony zewnętrznej/
+przyściennej); od v2.2 są wiercone od strony zewnętrznej (przyściennej), a
+ścianka zostaje od strony wewnętrznej — na wyraźne polecenie użytkownika.
+Patrz `specs/rifle-mount/decisions.md` ("v2.2 — kieszenie magnesów od
+strony ścianki").
 
 ## Opis funkcjonalny
 
@@ -92,7 +100,7 @@ Markdownie).
 project:
   name: "Magnetic Rifle Barrel Mount"
   model_id: "magnetic-rifle-mount-001"
-  spec_version: "2.1.0"
+  spec_version: "2.2.0"
   units: "mm"
 
 parameters:
@@ -156,7 +164,13 @@ parameters:
     tolerance: 0.1
     description: >
       Grubość plastiku pozostająca między dnem kieszeni magnesu a
-      zewnętrzną (przyścienną) powierzchnią płyty mocującej.
+      powierzchnią płyty mocującej po przeciwnej stronie. Do v2.1
+      kieszenie były wiercone od strony wewnętrznej, więc ta ścianka
+      zostawała od strony zewnętrznej (przyściennej). Od v2.2 kieszenie są
+      wiercone od strony zewnętrznej (przyściennej), więc ta ścianka
+      zostaje teraz od strony wewnętrznej — patrz
+      specs/rifle-mount/decisions.md ("v2.2 — kieszenie magnesów od strony
+      ścianki").
 
   - id: mounting_plate_size
     name: "Wymiar płyty mocującej (kwadrat)"
@@ -393,12 +407,13 @@ Kolejność operacji (patrz `src/cad_project/rifle_mount/model.py`):
 1. **Płyta mocująca**: kwadrat `mounting_plate_size` × `mounting_plate_size`
    × `mounting_plate_thickness`, zaokrąglone pionowe krawędzie narożników
    (`plate_corner_fillet_radius`).
-2. **Kieszenie na magnesy**: cztery ślepe otwory Ø`magnet_diameter` ×
-   `magnet_thickness` głębokości, wiercone od wewnętrznej strony płyty
-   (przeciwnej do ścianki), tak żeby zostało `magnet_pocket_wall_thickness`
-   materiału do zewnętrznej (przyściennej) powierzchni. Środki otworów
-   odsunięte o `magnet_edge_offset` od krawędzi płyty, symetrycznie w
-   czterech narożnikach.
+2. **Kieszenie na magnesy** (kierunek odwrócony w v2.2 — patrz
+   `decisions.md` "v2.2 — kieszenie magnesów od strony ścianki"): cztery
+   ślepe otwory Ø`magnet_diameter` × `magnet_thickness` głębokości,
+   wiercone od zewnętrznej (przyściennej) strony płyty, tak żeby zostało
+   `magnet_pocket_wall_thickness` materiału do wewnętrznej powierzchni.
+   Środki otworów odsunięte o `magnet_edge_offset` od krawędzi płyty,
+   symetrycznie w czterech narożnikach.
 3. **Tuleja gwintowana**: walec Ø(`thread_major_diameter` +
    2×`nut_wall_thickness`) × `nut_boss_length`, doklejony (fuzja) do
    wewnętrznej strony płyty, współosiowo z osią regulacji. Wewnątrz
@@ -542,3 +557,5 @@ generuje pliki dla **obu części osobno**:
 - [ ] **(v2)** przejście kołnierz → chwyt C nie ma nawisu > 45° od pionu
       (samo-podpierające, drukowalne bez podpór),
 - [ ] **(v2.1)** `u_wall_thickness` (ścianka/ramiona chwytu C) = 9.0mm.
+- [ ] **(v2.2)** kieszenie na magnesy w Części A są otwarte od strony
+      zewnętrznej (przyściennej), nie wewnętrznej.

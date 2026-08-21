@@ -130,6 +130,11 @@ def build_base_part() -> BasePartResult:
     cylinder) -> plain bore -> subtract thread ridges last (the boss's
     outer end face is only a simple, unambiguous flat disc as long as the
     thread cut happens after every other face-selection-based operation).
+
+    Magnet pockets are bored from the outer (wall-facing) face, not the
+    inner face - see specs/rifle-mount/decisions.md ("v2.2 - kieszenie
+    magnesów od strony ścianki"). This leaves magnet_pocket_wall_thickness
+    of material on the *inner* side instead of the wall side.
     """
     p.check_engineering_preconditions()
     positions = _magnet_positions()
@@ -139,8 +144,8 @@ def build_base_part() -> BasePartResult:
         vertical_edges = builder.edges().filter_by(Axis.Z)
         fillet(vertical_edges, radius=p.PLATE_CORNER_FILLET_RADIUS_MM)
 
-        inner_face = builder.faces().sort_by(Axis.Z)[-1]
-        with BuildSketch(inner_face), Locations(*positions):
+        outer_face = builder.faces().sort_by(Axis.Z)[0]
+        with BuildSketch(outer_face), Locations(*positions):
             Circle(p.MAGNET_DIAMETER_MM / 2)
         extrude(amount=-p.MAGNET_THICKNESS_MM, mode=Mode.SUBTRACT)
 

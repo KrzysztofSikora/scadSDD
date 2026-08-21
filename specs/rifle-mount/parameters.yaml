@@ -14,7 +14,7 @@
 project:
   name: "Magnetic Rifle Barrel Mount"
   model_id: "magnetic-rifle-mount-001"
-  spec_version: "2.1.0"
+  spec_version: "2.2.0"
   units: "mm"
 
 parameters:
@@ -78,7 +78,13 @@ parameters:
     tolerance: 0.1
     description: >
       Grubość plastiku pozostająca między dnem kieszeni magnesu a
-      zewnętrzną (przyścienną) powierzchnią płyty mocującej.
+      powierzchnią płyty mocującej po przeciwnej stronie. Do v2.1
+      kieszenie były wiercone od strony wewnętrznej, więc ta ścianka
+      zostawała od strony zewnętrznej (przyściennej). Od v2.2 kieszenie są
+      wiercone od strony zewnętrznej (przyściennej), więc ta ścianka
+      zostaje teraz od strony wewnętrznej — patrz
+      specs/rifle-mount/decisions.md ("v2.2 — kieszenie magnesów od strony
+      ścianki").
 
   - id: mounting_plate_size
     name: "Wymiar płyty mocującej (kwadrat)"

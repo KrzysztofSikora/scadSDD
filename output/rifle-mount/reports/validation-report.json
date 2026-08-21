@@ -1,21 +1,21 @@
 {
   "status": "passed",
-  "spec_version": "2.1.0",
+  "spec_version": "2.2.0",
   "model_id": "magnetic-rifle-mount-001",
-  "generated_at": "2026-08-21T12:15:43.335201+00:00",
+  "generated_at": "2026-08-21T12:34:34.653758+00:00",
   "parts": {
     "base": {
       "model": {
         "solid_count": 1,
         "is_valid": true,
-        "volume_mm3": 30622.80921018483,
-        "surface_area_mm2": 16534.862686737444,
+        "volume_mm3": 30622.82809532059,
+        "surface_area_mm2": 16534.87098220241,
         "bounding_box_mm": {
           "x": 60.0,
           "y": 60.0,
           "z": 48.0000001
         },
-        "mass_kg": 0.08268158486749905
+        "mass_kg": 0.0826816358573656
       },
       "features": {
         "magnet_count": 4,
@@ -97,7 +97,7 @@
       "id": "base_volume_positive",
       "description": "Bry\u0142a 'base' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
       "expected": "> 0",
-      "actual": 30622.80921018483,
+      "actual": 30622.82809532059,
       "tolerance": null,
       "status": "passed",
       "message": ""

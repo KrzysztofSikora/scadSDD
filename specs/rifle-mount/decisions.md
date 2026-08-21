@@ -483,3 +483,59 @@ kąt nawisu przejścia) przed wprowadzeniem jakiejkolwiek zmiany w
 `specs/`, i z liczbami wyprowadzonymi analitycznie (nie zgadniętymi) —
 zgodnie z `.claude/CLAUDE.md` ("Gdy specyfikacja jest niepełna lub
 sprzeczna").
+
+## 2026-08-21 — v2.2: kieszenie magnesów od strony ścianki (na wyraźne polecenie użytkownika)
+
+**Żądanie użytkownika**: "w elemencie w którym są magnesy, zrób tak aby
+były na odwrót". Niejednoznaczne sformułowanie — poproszono użytkownika o
+doprecyzowanie zamiast zgadywać (patrz `.claude/CLAUDE.md`, "Gdy
+specyfikacja jest niepełna lub sprzeczna"). Potwierdzone znaczenie:
+odwrócić stronę płyty, od której wiercone są kieszenie na magnesy.
+
+**Stan przed zmianą (v1–v2.1)**: kieszenie na magnesy wiercone od strony
+**wewnętrznej** płyty (przeciwnej do ścianki sejfu), zostawiając
+`magnet_pocket_wall_thickness` = 1mm materiału do strony **zewnętrznej**
+(przyściennej) — magnes leży możliwie blisko metalowej ścianki dla
+mocniejszego przyciągania, a kieszeń jest dostępna do wklejenia magnesu od
+strony wewnętrznej (przed przyklejeniem płyty do ścianki).
+
+**Zmiana (v2.2)**: kieszenie wiercone od strony **zewnętrznej**
+(przyściennej), zostawiając `magnet_pocket_wall_thickness` materiału do
+strony **wewnętrznej**. Konsekwencje fizyczne, przedstawione użytkownikowi
+przed implementacją: magnes będzie oddalony od metalowej ścianki o 1mm
+warstwy plastiku (jak poprzednio — ten wymiar się nie zmienił, zmienia się
+tylko po której stronie leży), ale teraz magnes trzeba wkleić od strony
+zewnętrznej, czyli **przed** przyklejeniem/przyłożeniem płyty do ścianki
+sejfu (nie po). Nie zmienia to siły przyciągania (grubość ścianki nad
+magnesem, `magnet_pocket_wall_thickness`, pozostaje 1.0mm — niezmieniona),
+tylko stronę montażu.
+
+**Implementacja** (`src/cad_project/rifle_mount/model.py::build_base_part`):
+sketch kieszeni magnesów przeniesiony z `builder.faces().sort_by(Axis.Z)[-1]`
+(góra/wewnętrzna) na `builder.faces().sort_by(Axis.Z)[0]` (dół/zewnętrzna/
+przyścienna) — znak `extrude(amount=-magnet_thickness, mode=SUBTRACT)`
+pozostał bez zmian (ujemny offset zawsze wycina do wnętrza względem
+normalnej wybranej ściany, niezależnie od tego, którą ścianę wybrano).
+Selekcja ściany tulei gwintowanej (`boss_base_face`, nadal góra/
+wewnętrzna) nie wymagała zmiany — jest niezależna od strony kieszeni na
+magnesy.
+
+**Weryfikacja**: zbudowano Część A i sprawdzono bezpośrednio (klasyfikator
+brył OCCT, punkt-w-bryle) że punkt tuż przy dolnej (zewnętrznej) ścianie w
+osi otworu na magnes leży **poza** bryłą (pusta kieszeń), a punkt tuż przy
+górnej (wewnętrznej) ścianie leży **wewnątrz** bryły (materiał) — potwierdza
+odwrócenie kierunku, nie tylko wyliczenie. Bryła nadal `is_valid=True`,
+dokładnie 1 bryła, objętość praktycznie niezmieniona względem v2.1
+(30622.828 mm³ vs 30622.809 mm³ — różnica rzędu numerycznego szumu OCCT z
+operacji boolowskich na przeciwnej ścianie, nie błąd). Wszystkie testy
+`pytest tests/rifle_mount/` przechodzą, pełny pipeline (`build → measure →
+validate → export → render`) kończy się `status: passed`.
+
+**Bez zmian**: `magnet_pocket_wall_thickness` (1.0mm), pozycje magnesów
+(`magnet_edge_offset`), liczba magnesów, wszystkie pozostałe parametry
+Części A i całej Części B.
+
+**Uzasadnienie**: zmiana geometrii na wyraźne (po doprecyzowaniu) życzenie
+użytkownika, z jawnym ujawnieniem konsekwencji montażowej (kolejność
+wklejania magnesów względem montażu do ścianki) przed implementacją, i z
+weryfikacją bezpośrednio na zbudowanej bryle, nie tylko na kodzie.
