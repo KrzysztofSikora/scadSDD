@@ -2,7 +2,7 @@
 
 Two independent parts, matching the physical, hand-assembled product:
 
-* **Base** — square plate with 4 magnet pockets + a threaded nut boss.
+* **Base** — square plate with 2 magnet pockets + a threaded nut boss.
 * **Arm** — externally threaded rod + stop collar + C-shaped barrel cradle.
 
 Building never exports or writes any file. See ``specs/rifle-mount/spec.md``
@@ -40,6 +40,7 @@ from build123d import (
     Mode,
     Part,
     Plane,
+    Rectangle,
     RectangleRounded,
     extrude,
     fillet,
@@ -66,7 +67,8 @@ class BaseFeatures:
     plate_size_mm: float
     plate_thickness_mm: float
     magnet_count: int
-    magnet_diameter_mm: float
+    magnet_pocket_length_mm: float
+    magnet_pocket_width_mm: float
     magnet_positions_mm: tuple[tuple[float, float], ...]
     nut_boss_outer_diameter_mm: float
     nut_boss_length_mm: float
@@ -119,8 +121,8 @@ _MAX_SINGLE_INTERNAL_THREAD_CUT_MM = 20.0
 
 
 def _magnet_positions() -> tuple[tuple[float, float], ...]:
-    x = p.MOUNTING_PLATE_SIZE_MM / 2 - p.MAGNET_EDGE_OFFSET_MM
-    return ((x, x), (x, -x), (-x, x), (-x, -x))
+    y = p.MAGNET_CENTER_OFFSET_Y_MM
+    return ((0.0, y), (0.0, -y))
 
 
 def build_base_part() -> BasePartResult:
@@ -135,6 +137,10 @@ def build_base_part() -> BasePartResult:
     inner face - see specs/rifle-mount/decisions.md ("v2.2 - kieszenie
     magnesów od strony ścianki"). This leaves magnet_pocket_wall_thickness
     of material on the *inner* side instead of the wall side.
+
+    Pockets are rectangular (adhesive magnetic strips, not disc magnets)
+    since v3 - see specs/rifle-mount/decisions.md ("v3 - paski
+    magnetyczne zamiast dysków").
     """
     p.check_engineering_preconditions()
     positions = _magnet_positions()
@@ -146,7 +152,7 @@ def build_base_part() -> BasePartResult:
 
         outer_face = builder.faces().sort_by(Axis.Z)[0]
         with BuildSketch(outer_face), Locations(*positions):
-            Circle(p.MAGNET_DIAMETER_MM / 2)
+            Rectangle(p.MAGNET_POCKET_LENGTH_MM, p.MAGNET_POCKET_WIDTH_MM)
         extrude(amount=-p.MAGNET_THICKNESS_MM, mode=Mode.SUBTRACT)
 
         boss_base_face = builder.faces().sort_by(Axis.Z)[-1]
@@ -183,7 +189,8 @@ def build_base_part() -> BasePartResult:
         plate_size_mm=p.MOUNTING_PLATE_SIZE_MM,
         plate_thickness_mm=p.MOUNTING_PLATE_THICKNESS_MM,
         magnet_count=p.MAGNET_COUNT,
-        magnet_diameter_mm=p.MAGNET_DIAMETER_MM,
+        magnet_pocket_length_mm=p.MAGNET_POCKET_LENGTH_MM,
+        magnet_pocket_width_mm=p.MAGNET_POCKET_WIDTH_MM,
         magnet_positions_mm=positions,
         nut_boss_outer_diameter_mm=p.NUT_BOSS_OUTER_DIAMETER_MM,
         nut_boss_length_mm=p.NUT_BOSS_LENGTH_MM,

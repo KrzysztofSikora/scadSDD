@@ -14,22 +14,25 @@
 project:
   name: "Magnetic Rifle Barrel Mount"
   model_id: "magnetic-rifle-mount-001"
-  spec_version: "2.2.0"
+  spec_version: "3.0.0"
   units: "mm"
 
 parameters:
   - id: wall_to_barrel_center_min
     name: "Minimalna odległość ścianka -> środek lufy"
-    value: 86.0
+    value: 87.0
     unit: mm
     tolerance: 0.3
     description: >
       Minimalna odległość od ścianki sejfu (powierzchni stykającej się z
       magnesami) do środka lufy spoczywającej w chwycie C, przy
-      maksymalnie wkręconym mechanizmie regulacji. Podniesione z 80.0mm do
-      86.0mm w v2.1, żeby zrobić miejsce na bardziej masywną (grubszą)
-      tylną ściankę chwytu C — patrz specs/rifle-mount/decisions.md
-      ("v2.1 — masywniejszy chwyt C").
+      maksymalnie wkręconym mechanizmie regulacji. Podniesione z 86.0mm do
+      87.0mm w v3, żeby zrekompensować wzrost mounting_plate_thickness
+      (4→5mm, wymuszony grubszymi paskami magnetycznymi) w stałym offsecie
+      łańcucha wymiarowego — bez tej korekty wysuw minimalny wychodziłby
+      ujemny (geometrycznie niemożliwy). Zachowuje ten sam ~0.5mm dodatni
+      zapas co w v2.1 — patrz specs/rifle-mount/decisions.md ("v3 — paski
+      magnetyczne zamiast dysków").
 
   - id: wall_to_barrel_center_max
     name: "Maksymalna odległość ścianka -> środek lufy"
@@ -50,26 +53,47 @@ parameters:
       wyznaczenia prześwitu w chwycie C i pozycji środka lufy. Nie jest
       cechą wytwarzaną modelu.
 
-  - id: magnet_diameter
-    name: "Średnica magnesu neodymowego"
-    value: 12.0
+  - id: magnet_pocket_length
+    name: "Długość kieszeni paska magnetycznego"
+    value: 45.0
     unit: mm
-    tolerance: 0.05
-    description: Średnica każdego z czterech magnesów dyskowych.
+    tolerance: 0.2
+    description: >
+      Długość (dłuższy wymiar, wzdłuż krawędzi płyty) prostokątnej
+      kieszeni na samoprzylepny pasek magnetyczny (magnesy do
+      identyfikatorów, nie dyski neodymowe) — patrz
+      specs/rifle-mount/decisions.md ("v3 — paski magnetyczne zamiast
+      dysków"). Odpowiada wymiarowi fizycznego paska.
+
+  - id: magnet_pocket_width
+    name: "Szerokość kieszeni paska magnetycznego"
+    value: 13.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Szerokość (krótszy wymiar w płaszczyźnie płyty) prostokątnej kieszeni
+      na pasek magnetyczny. Odpowiada wymiarowi fizycznego paska.
 
   - id: magnet_thickness
-    name: "Grubość magnesu neodymowego"
-    value: 3.0
+    name: "Grubość paska magnetycznego"
+    value: 4.0
     unit: mm
     tolerance: 0.05
-    description: Grubość (wysokość) każdego magnesu dyskowego.
+    description: >
+      Grubość (wysokość) każdego paska magnetycznego. Podniesiona z 3.0mm
+      (dysk neodymowy) do 4.0mm w v3 — patrz specs/rifle-mount/decisions.md
+      ("v3 — paski magnetyczne zamiast dysków").
 
   - id: magnet_count
-    name: "Liczba magnesów"
-    value: 4
+    name: "Liczba pasków magnetycznych"
+    value: 2
     unit: count
     tolerance: 0
-    description: Liczba magnesów neodymowych mocujących do ścianki sejfu.
+    description: >
+      Liczba pasków magnetycznych mocujących do ścianki sejfu, po jednym
+      pasku w każdej kieszeni. Zmniejszona z 4 (dyski) do 2 (paski) w v3,
+      bo pojedynczy pasek 45×13mm zajmuje znacznie więcej miejsca na
+      płycie niż dysk Ø12mm — patrz specs/rifle-mount/decisions.md.
 
   - id: magnet_pocket_wall_thickness
     name: "Grubość ścianki nad magnesem"
@@ -78,40 +102,49 @@ parameters:
     tolerance: 0.1
     description: >
       Grubość plastiku pozostająca między dnem kieszeni magnesu a
-      powierzchnią płyty mocującej po przeciwnej stronie. Do v2.1
-      kieszenie były wiercone od strony wewnętrznej, więc ta ścianka
-      zostawała od strony zewnętrznej (przyściennej). Od v2.2 kieszenie są
-      wiercone od strony zewnętrznej (przyściennej), więc ta ścianka
-      zostaje teraz od strony wewnętrznej — patrz
+      powierzchnią płyty mocującej po przeciwnej stronie. Kieszenie są
+      wiercone od strony zewnętrznej (przyściennej) — patrz
       specs/rifle-mount/decisions.md ("v2.2 — kieszenie magnesów od strony
-      ścianki").
+      ścianki"), niezmienione w v3.
 
   - id: mounting_plate_size
     name: "Wymiar płyty mocującej (kwadrat)"
-    value: 60.0
+    value: 72.0
     unit: mm
     tolerance: 0.2
     description: >
-      Długość boku kwadratowej płyty mocującej z magnesami. Dobrana tak,
-      by kieszenie na magnesy w narożnikach nie kolidowały z tuleją
-      gwintowaną (nut_boss_outer_diameter) w środku płyty — patrz
-      specs/rifle-mount/decisions.md.
+      Długość boku kwadratowej płyty mocującej z paskami magnetycznymi.
+      Powiększona z 60.0mm do 72.0mm w v3, żeby zmieścić dwie kieszenie
+      45×13mm (paski magnetyczne) z zapasem do krawędzi płyty i bez
+      kolizji z tuleją gwintowaną (nut_boss_outer_diameter) w środku płyty
+      — patrz specs/rifle-mount/decisions.md ("v3 — paski magnetyczne
+      zamiast dysków").
 
   - id: mounting_plate_thickness
     name: "Grubość płyty mocującej"
-    value: 4.0
+    value: 5.0
     unit: mm
     tolerance: 0.1
     description: >
       Całkowita grubość płyty mocującej (magnet_thickness +
       magnet_pocket_wall_thickness) — spójność sprawdzana automatycznie.
+      Podniesiona z 4.0mm do 5.0mm w v3 razem z grubszym paskiem
+      magnetycznym (magnet_thickness 3→4mm) — patrz
+      specs/rifle-mount/decisions.md.
 
-  - id: magnet_edge_offset
-    name: "Odsunięcie środka magnesu od krawędzi płyty"
-    value: 10.0
+  - id: magnet_center_offset_y
+    name: "Odsunięcie środka kieszeni paska od środka płyty"
+    value: 24.0
     unit: mm
     tolerance: 0.2
-    description: Odległość środka każdego magnesu od najbliższej krawędzi płyty.
+    description: >
+      Odległość środka każdej z dwóch kieszeni od środka płyty, wzdłuż osi
+      prostopadłej do dłuższego wymiaru paska (magnet_pocket_length) —
+      obie kieszenie leżą symetrycznie po przeciwnych stronach środka
+      (osi tulei gwintowanej), wyśrodkowane wzdłuż drugiej osi. Zastępuje
+      magnet_edge_offset z v1–v2.2 (nieadekwatny dla prostokątnych,
+      niekwadratowych kieszeni) — patrz specs/rifle-mount/decisions.md
+      ("v3 — paski magnetyczne zamiast dysków").
 
   - id: plate_corner_fillet_radius
     name: "Promień zaokrąglenia narożników płyty"

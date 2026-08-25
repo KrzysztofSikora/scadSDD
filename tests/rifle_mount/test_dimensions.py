@@ -24,27 +24,29 @@ def test_base_bounding_box_height_includes_boss(built_result):
     assert measurements.bounding_box_mm.z_mm == pytest.approx(expected_height, abs=0.2)
 
 
-def test_magnet_count_and_diameter(built_result):
+def test_magnet_count_and_pocket_size(built_result):
     features = built_result.base.features
     assert features.magnet_count == p.MAGNET_COUNT
-    assert features.magnet_diameter_mm == pytest.approx(
-        p.MAGNET_DIAMETER_MM, abs=p.tolerance_for("magnet_diameter")
+    assert features.magnet_pocket_length_mm == pytest.approx(
+        p.MAGNET_POCKET_LENGTH_MM, abs=p.tolerance_for("magnet_pocket_length")
+    )
+    assert features.magnet_pocket_width_mm == pytest.approx(
+        p.MAGNET_POCKET_WIDTH_MM, abs=p.tolerance_for("magnet_pocket_width")
     )
 
 
 def test_magnet_positions_are_symmetric(built_result):
     positions = set(built_result.base.features.magnet_positions_mm)
     for x, y in positions:
-        assert (-x, y) in positions
         assert (x, -y) in positions
-        assert (-x, -y) in positions
 
 
-def test_magnet_edge_offset(built_result):
-    expected = p.MOUNTING_PLATE_SIZE_MM / 2 - p.MAGNET_EDGE_OFFSET_MM
+def test_magnet_center_offset_y(built_result):
     for x, y in built_result.base.features.magnet_positions_mm:
-        assert abs(abs(x) - expected) <= p.tolerance_for("magnet_edge_offset")
-        assert abs(abs(y) - expected) <= p.tolerance_for("magnet_edge_offset")
+        assert x == pytest.approx(0.0, abs=1e-9)
+        assert abs(y) == pytest.approx(
+            p.MAGNET_CENTER_OFFSET_Y_MM, abs=p.tolerance_for("magnet_center_offset_y")
+        )
 
 
 def test_arm_bounding_box_length(built_result):

@@ -94,8 +94,20 @@ def test_model_is_deterministic_across_two_builds(built_result):
 
 
 def test_magnet_pocket_boss_collision_raises_clear_error(monkeypatch):
-    monkeypatch.setattr(p, "MOUNTING_PLATE_SIZE_MM", 50.0)
+    monkeypatch.setattr(p, "MAGNET_CENTER_OFFSET_Y_MM", 18.0)
     with pytest.raises(SpecificationError, match="collide"):
+        p.check_engineering_preconditions()
+
+
+def test_magnet_pocket_exceeds_plate_raises_clear_error(monkeypatch):
+    monkeypatch.setattr(p, "MOUNTING_PLATE_SIZE_MM", 50.0)
+    with pytest.raises(SpecificationError, match="plate edge"):
+        p.check_engineering_preconditions()
+
+
+def test_magnet_pockets_overlap_raises_clear_error(monkeypatch):
+    monkeypatch.setattr(p, "MAGNET_CENTER_OFFSET_Y_MM", 5.0)
+    with pytest.raises(SpecificationError, match="overlap"):
         p.check_engineering_preconditions()
 
 

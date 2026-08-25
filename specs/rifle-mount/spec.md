@@ -11,7 +11,7 @@
 |------------------------|-----------------------------------|
 | Nazwa projektu        | Magnetic Rifle Barrel Mount       |
 | Identyfikator modelu  | `magnetic-rifle-mount-001`        |
-| Wersja specyfikacji   | `2.2.0`                           |
+| Wersja specyfikacji   | `3.0.0`                           |
 | Jednostki             | milimetry (mm)                    |
 
 **Iteracja 2 (v2)**: zachowuje zakres regulacji 80–140mm z v1 bez zmian
@@ -39,6 +39,16 @@ przyściennej); od v2.2 są wiercone od strony zewnętrznej (przyściennej), a
 Patrz `specs/rifle-mount/decisions.md` ("v2.2 — kieszenie magnesów od
 strony ścianki").
 
+**Iteracja 5 (v3, ta wersja)**: zastępuje cztery dyskowe magnesy neodymowe
+(Ø12×3mm) dwoma samoprzylepnymi paskami magnetycznymi do identyfikatorów
+(45×13×4mm, po jednym pasku w kieszeni), na wyraźne polecenie użytkownika.
+Wymusza wzrost `mounting_plate_thickness` (4→5mm) i `mounting_plate_size`
+(60→72mm) oraz — żeby zakres regulacji pozostał geometrycznie możliwy —
+podniesienie `wall_to_barrel_center_min` (86→87mm). Patrz
+`specs/rifle-mount/decisions.md` ("v3 — paski magnetyczne zamiast
+dysków") po pełne wyprowadzenie liczb i ujawnienie konfliktu użytkownikowi
+przed implementacją.
+
 ## Opis funkcjonalny
 
 Uchwyt mocowany magnetycznie do metalowej ścianki sejfu, przytrzymujący
@@ -46,7 +56,7 @@ lufę karabinu w chwycie w kształcie litery C (otwartym w stronę czubka
 ramienia, z dala od ściany — patrz `decisions.md`, "U -> C cradle
 reorientation"). Składa się z **dwóch części**:
 
-* **Część A („podstawa")** — płyta z czterema magnesami neodymowymi
+* **Część A („podstawa")** — płyta z dwoma paskami magnetycznymi
   (mocowanie do ścianki) i tuleją z gwintem wewnętrznym.
 * **Część B („ramię")** — trzpień z gwintem zewnętrznym, zakończony
   kołnierzem oporowym i chwytem C na lufę.
@@ -64,16 +74,17 @@ Markdownie).
 
 | Nazwa | ID techniczne | Wartość | Jednostka | Tolerancja |
 |---|---|---|---|---|
-| Min. odległość ścianka→lufa | `wall_to_barrel_center_min` | 86.0 | mm | ±0.3 |
+| Min. odległość ścianka→lufa | `wall_to_barrel_center_min` | 87.0 | mm | ±0.3 |
 | Maks. odległość ścianka→lufa | `wall_to_barrel_center_max` | 140.0 | mm | ±0.3 |
 | Referencyjna średnica lufy | `barrel_diameter_reference` | 20.0 | mm | ±0.5 |
-| Średnica magnesu | `magnet_diameter` | 12.0 | mm | ±0.05 |
-| Grubość magnesu | `magnet_thickness` | 3.0 | mm | ±0.05 |
-| Liczba magnesów | `magnet_count` | 4 | szt. | 0 |
+| Długość kieszeni paska magnetycznego | `magnet_pocket_length` | 45.0 | mm | ±0.2 |
+| Szerokość kieszeni paska magnetycznego | `magnet_pocket_width` | 13.0 | mm | ±0.2 |
+| Grubość paska magnetycznego | `magnet_thickness` | 4.0 | mm | ±0.05 |
+| Liczba pasków magnetycznych | `magnet_count` | 2 | szt. | 0 |
 | Ścianka nad magnesem | `magnet_pocket_wall_thickness` | 1.0 | mm | ±0.1 |
-| Wymiar płyty mocującej | `mounting_plate_size` | 60.0 | mm | ±0.2 |
-| Grubość płyty mocującej | `mounting_plate_thickness` | 4.0 | mm | ±0.1 |
-| Odsunięcie magnesu od krawędzi | `magnet_edge_offset` | 10.0 | mm | ±0.2 |
+| Wymiar płyty mocującej | `mounting_plate_size` | 72.0 | mm | ±0.2 |
+| Grubość płyty mocującej | `mounting_plate_thickness` | 5.0 | mm | ±0.1 |
+| Odsunięcie kieszeni od środka płyty | `magnet_center_offset_y` | 24.0 | mm | ±0.2 |
 | Zaokrąglenie narożników płyty | `plate_corner_fillet_radius` | 5.0 | mm | ±0.2 |
 | Skok gwintu | `thread_pitch` | 4.0 | mm | ±0.1 |
 | Średnica trzpienia (gwint) | `thread_major_diameter` | 25.0 | mm | ±0.1 |
@@ -100,22 +111,25 @@ Markdownie).
 project:
   name: "Magnetic Rifle Barrel Mount"
   model_id: "magnetic-rifle-mount-001"
-  spec_version: "2.2.0"
+  spec_version: "3.0.0"
   units: "mm"
 
 parameters:
   - id: wall_to_barrel_center_min
     name: "Minimalna odległość ścianka -> środek lufy"
-    value: 86.0
+    value: 87.0
     unit: mm
     tolerance: 0.3
     description: >
       Minimalna odległość od ścianki sejfu (powierzchni stykającej się z
       magnesami) do środka lufy spoczywającej w chwycie C, przy
-      maksymalnie wkręconym mechanizmie regulacji. Podniesione z 80.0mm do
-      86.0mm w v2.1, żeby zrobić miejsce na bardziej masywną (grubszą)
-      tylną ściankę chwytu C — patrz specs/rifle-mount/decisions.md
-      ("v2.1 — masywniejszy chwyt C").
+      maksymalnie wkręconym mechanizmie regulacji. Podniesione z 86.0mm do
+      87.0mm w v3, żeby zrekompensować wzrost mounting_plate_thickness
+      (4→5mm, wymuszony grubszymi paskami magnetycznymi) w stałym offsecie
+      łańcucha wymiarowego — bez tej korekty wysuw minimalny wychodziłby
+      ujemny (geometrycznie niemożliwy). Zachowuje ten sam ~0.5mm dodatni
+      zapas co w v2.1 — patrz specs/rifle-mount/decisions.md ("v3 — paski
+      magnetyczne zamiast dysków").
 
   - id: wall_to_barrel_center_max
     name: "Maksymalna odległość ścianka -> środek lufy"
@@ -136,26 +150,47 @@ parameters:
       wyznaczenia prześwitu w chwycie C i pozycji środka lufy. Nie jest
       cechą wytwarzaną modelu.
 
-  - id: magnet_diameter
-    name: "Średnica magnesu neodymowego"
-    value: 12.0
+  - id: magnet_pocket_length
+    name: "Długość kieszeni paska magnetycznego"
+    value: 45.0
     unit: mm
-    tolerance: 0.05
-    description: Średnica każdego z czterech magnesów dyskowych.
+    tolerance: 0.2
+    description: >
+      Długość (dłuższy wymiar, wzdłuż krawędzi płyty) prostokątnej
+      kieszeni na samoprzylepny pasek magnetyczny (magnesy do
+      identyfikatorów, nie dyski neodymowe) — patrz
+      specs/rifle-mount/decisions.md ("v3 — paski magnetyczne zamiast
+      dysków"). Odpowiada wymiarowi fizycznego paska.
+
+  - id: magnet_pocket_width
+    name: "Szerokość kieszeni paska magnetycznego"
+    value: 13.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Szerokość (krótszy wymiar w płaszczyźnie płyty) prostokątnej kieszeni
+      na pasek magnetyczny. Odpowiada wymiarowi fizycznego paska.
 
   - id: magnet_thickness
-    name: "Grubość magnesu neodymowego"
-    value: 3.0
+    name: "Grubość paska magnetycznego"
+    value: 4.0
     unit: mm
     tolerance: 0.05
-    description: Grubość (wysokość) każdego magnesu dyskowego.
+    description: >
+      Grubość (wysokość) każdego paska magnetycznego. Podniesiona z 3.0mm
+      (dysk neodymowy) do 4.0mm w v3 — patrz specs/rifle-mount/decisions.md
+      ("v3 — paski magnetyczne zamiast dysków").
 
   - id: magnet_count
-    name: "Liczba magnesów"
-    value: 4
+    name: "Liczba pasków magnetycznych"
+    value: 2
     unit: count
     tolerance: 0
-    description: Liczba magnesów neodymowych mocujących do ścianki sejfu.
+    description: >
+      Liczba pasków magnetycznych mocujących do ścianki sejfu, po jednym
+      pasku w każdej kieszeni. Zmniejszona z 4 (dyski) do 2 (paski) w v3,
+      bo pojedynczy pasek 45×13mm zajmuje znacznie więcej miejsca na
+      płycie niż dysk Ø12mm — patrz specs/rifle-mount/decisions.md.
 
   - id: magnet_pocket_wall_thickness
     name: "Grubość ścianki nad magnesem"
@@ -164,40 +199,49 @@ parameters:
     tolerance: 0.1
     description: >
       Grubość plastiku pozostająca między dnem kieszeni magnesu a
-      powierzchnią płyty mocującej po przeciwnej stronie. Do v2.1
-      kieszenie były wiercone od strony wewnętrznej, więc ta ścianka
-      zostawała od strony zewnętrznej (przyściennej). Od v2.2 kieszenie są
-      wiercone od strony zewnętrznej (przyściennej), więc ta ścianka
-      zostaje teraz od strony wewnętrznej — patrz
+      powierzchnią płyty mocującej po przeciwnej stronie. Kieszenie są
+      wiercone od strony zewnętrznej (przyściennej) — patrz
       specs/rifle-mount/decisions.md ("v2.2 — kieszenie magnesów od strony
-      ścianki").
+      ścianki"), niezmienione w v3.
 
   - id: mounting_plate_size
     name: "Wymiar płyty mocującej (kwadrat)"
-    value: 60.0
+    value: 72.0
     unit: mm
     tolerance: 0.2
     description: >
-      Długość boku kwadratowej płyty mocującej z magnesami. Dobrana tak,
-      by kieszenie na magnesy w narożnikach nie kolidowały z tuleją
-      gwintowaną (nut_boss_outer_diameter) w środku płyty — patrz
-      specs/rifle-mount/decisions.md.
+      Długość boku kwadratowej płyty mocującej z paskami magnetycznymi.
+      Powiększona z 60.0mm do 72.0mm w v3, żeby zmieścić dwie kieszenie
+      45×13mm (paski magnetyczne) z zapasem do krawędzi płyty i bez
+      kolizji z tuleją gwintowaną (nut_boss_outer_diameter) w środku płyty
+      — patrz specs/rifle-mount/decisions.md ("v3 — paski magnetyczne
+      zamiast dysków").
 
   - id: mounting_plate_thickness
     name: "Grubość płyty mocującej"
-    value: 4.0
+    value: 5.0
     unit: mm
     tolerance: 0.1
     description: >
       Całkowita grubość płyty mocującej (magnet_thickness +
       magnet_pocket_wall_thickness) — spójność sprawdzana automatycznie.
+      Podniesiona z 4.0mm do 5.0mm w v3 razem z grubszym paskiem
+      magnetycznym (magnet_thickness 3→4mm) — patrz
+      specs/rifle-mount/decisions.md.
 
-  - id: magnet_edge_offset
-    name: "Odsunięcie środka magnesu od krawędzi płyty"
-    value: 10.0
+  - id: magnet_center_offset_y
+    name: "Odsunięcie środka kieszeni paska od środka płyty"
+    value: 24.0
     unit: mm
     tolerance: 0.2
-    description: Odległość środka każdego magnesu od najbliższej krawędzi płyty.
+    description: >
+      Odległość środka każdej z dwóch kieszeni od środka płyty, wzdłuż osi
+      prostopadłej do dłuższego wymiaru paska (magnet_pocket_length) —
+      obie kieszenie leżą symetrycznie po przeciwnych stronach środka
+      (osi tulei gwintowanej), wyśrodkowane wzdłuż drugiej osi. Zastępuje
+      magnet_edge_offset z v1–v2.2 (nieadekwatny dla prostokątnych,
+      niekwadratowych kieszeni) — patrz specs/rifle-mount/decisions.md
+      ("v3 — paski magnetyczne zamiast dysków").
 
   - id: plate_corner_fillet_radius
     name: "Promień zaokrąglenia narożników płyty"
@@ -407,13 +451,17 @@ Kolejność operacji (patrz `src/cad_project/rifle_mount/model.py`):
 1. **Płyta mocująca**: kwadrat `mounting_plate_size` × `mounting_plate_size`
    × `mounting_plate_thickness`, zaokrąglone pionowe krawędzie narożników
    (`plate_corner_fillet_radius`).
-2. **Kieszenie na magnesy** (kierunek odwrócony w v2.2 — patrz
-   `decisions.md` "v2.2 — kieszenie magnesów od strony ścianki"): cztery
-   ślepe otwory Ø`magnet_diameter` × `magnet_thickness` głębokości,
-   wiercone od zewnętrznej (przyściennej) strony płyty, tak żeby zostało
-   `magnet_pocket_wall_thickness` materiału do wewnętrznej powierzchni.
-   Środki otworów odsunięte o `magnet_edge_offset` od krawędzi płyty,
-   symetrycznie w czterech narożnikach.
+2. **Kieszenie na paski magnetyczne** (kierunek wiercenia od v2.2 — patrz
+   `decisions.md` "v2.2 — kieszenie magnesów od strony ścianki"; kształt i
+   liczba kieszeni od v3 — patrz `decisions.md` "v3 — paski magnetyczne
+   zamiast dysków"): dwie prostokątne ślepe kieszenie
+   `magnet_pocket_length` × `magnet_pocket_width` × `magnet_thickness`
+   głębokości, wiercone od zewnętrznej (przyściennej) strony płyty, tak
+   żeby zostało `magnet_pocket_wall_thickness` materiału do wewnętrznej
+   powierzchni. Kieszenie wyśrodkowane wzdłuż osi X (dłuższym wymiarem
+   `magnet_pocket_length` równoległym do krawędzi płyty), a ich środki
+   odsunięte symetrycznie o `magnet_center_offset_y` od środka płyty wzdłuż
+   osi Y (jedna nad, jedna pod tuleją gwintowaną).
 3. **Tuleja gwintowana**: walec Ø(`thread_major_diameter` +
    2×`nut_wall_thickness`) × `nut_boss_length`, doklejony (fuzja) do
    wewnętrznej strony płyty, współosiowo z osią regulacji. Wewnątrz
@@ -464,43 +512,49 @@ referencyjnej leży dokładnie na osi gwintu/regulacji. Odległość od
 kołnierza do środka lufy wzdłuż osi regulacji to `u_wall_thickness +
 barrel_diameter_reference/2` (lufa styka się z tylną ścianką chwytu C).
 
-Stały offset (części niezmienne przy regulacji), **od v2.1 z pogrubioną
-`u_wall_thickness` i podwyższonym `cradle_transition_height`**:
+Stały offset (części niezmienne przy regulacji), **od v3 z grubszą
+`mounting_plate_thickness`**:
 `mounting_plate_thickness + nut_boss_length + collar_length +
 cradle_transition_height + u_wall_thickness + barrel_diameter_reference/2`
-= 4+44+10+8.5+9+10 = **85.5 mm**.
+= 5+44+10+8.5+9+10 = **86.5 mm**.
 
 Wysuw trzpienia (część zmienna) = `wall_to_barrel_center_{min,max} -
-85.5mm` = **0.5–54.5 mm** (rozpiętość 54 mm, zgodna z różnicą
-`wall_to_barrel_center_max - wall_to_barrel_center_min` = 140-86).
+86.5mm` = **0.5–53.5 mm** (rozpiętość 53 mm, zgodna z różnicą
+`wall_to_barrel_center_max - wall_to_barrel_center_min` = 140-87).
 
-`rod_threaded_length` (112 mm) musi być ≥ wysuw_max (54.5mm) +
-`thread_engagement_length` (40mm) = 94.5mm — spełnione z 17.5mm
-marginesu (lepiej niż w v2, bo wysuw maksymalny się skrócił razem ze
-skróceniem zakresu regulacji).
+`rod_threaded_length` (112 mm) musi być ≥ wysuw_max (53.5mm) +
+`thread_engagement_length` (40mm) = 93.5mm — spełnione z 18.5mm
+marginesu.
 
-**Uwaga o marginesie przy minimum (v2.1)**: wysuw przy minimalnej
-odległości (86mm) wynosi tylko **0.5mm** — ten sam bardzo mały, ale
-dodatni zapas co w v2 (wymagany ściśle > 0 przez
-`check_engineering_preconditions()`), świadomie zachowany identyczny przy
-podnoszeniu `wall_to_barrel_center_min`. Patrz
+**Uwaga o marginesie przy minimum (v3)**: wysuw przy minimalnej
+odległości (87mm) wynosi tylko **0.5mm** — ten sam bardzo mały, ale
+dodatni zapas co w v2/v2.1 (wymagany ściśle > 0 przez
+`check_engineering_preconditions()`), świadomie zachowany identyczny przez
+podniesienie `wall_to_barrel_center_min` o dokładnie tyle, ile wzrósł
+`mounting_plate_thickness` (+1mm). Patrz
 `specs/rifle-mount/constraints.md` po opis tego ograniczenia i
-`decisions.md` ("v2.1 — masywniejszy chwyt C") po pełne wyprowadzenie.
+`decisions.md` ("v3 — paski magnetyczne zamiast dysków") po pełne
+wyprowadzenie.
 
 ## Reguły
 
 * Model składa się z dokładnie **dwóch części** (Część A, Część B) — nie
   jednej połączonej bryły (mają być osobno wydrukowane i skręcane).
 * Gwint musi zapewniać pełne zazębienie (`thread_engagement_length`) w
-  całym zakresie regulacji 86–140 mm — patrz wyprowadzenie wyżej.
+  całym zakresie regulacji 87–140 mm — patrz wyprowadzenie wyżej.
 * Kołnierz oporowy (`collar_diameter`) musi być większy niż
   `thread_major_diameter` (żeby ograniczał wkręcanie) i mniejszy niż
   średnica zewnętrzna tulei `thread_major_diameter + 2×nut_wall_thickness`
   (żeby mógł się o nią oprzeć bez kolizji).
-* Cztery magnesy nie mogą się nakładać ani wychodzić poza krawędź płyty:
-  `magnet_edge_offset > magnet_diameter/2` i rozstaw między sąsiednimi
-  magnesami (`mounting_plate_size - 2×magnet_edge_offset`) musi być
-  większy niż `magnet_diameter`.
+* **(v3)** Dwie kieszenie na paski magnetyczne nie mogą się nakładać,
+  wychodzić poza krawędź płyty ani kolidować z tuleją gwintowaną:
+  `magnet_center_offset_y > magnet_pocket_width/2` (kieszenie po
+  przeciwnych stronach środka się nie stykają), `magnet_pocket_length/2 <
+  mounting_plate_size/2` i `magnet_center_offset_y +
+  magnet_pocket_width/2 < mounting_plate_size/2` (obie kieszenie mieszczą
+  się w płycie), oraz `magnet_center_offset_y - magnet_pocket_width/2 >
+  nut_boss_outer_diameter/2` (najbliższa krawędź kieszeni nie wchodzi w
+  rzut tulei gwintowanej na płaszczyznę płyty).
 * `u_internal_width` musi być większy niż `barrel_diameter_reference`
   (swobodny prześwit).
 * `liner_groove_depth` musi być mniejszy niż `u_wall_thickness` (rowek nie

@@ -102,11 +102,18 @@ def _base_feature_checks(features: BaseFeatures) -> list[ValidationCheck]:
             else f"Expected {p.MAGNET_COUNT} magnets, got {features.magnet_count}.",
         ),
         _dimension_check(
-            "magnet_diameter",
-            "Średnica magnesów zgodna ze specyfikacją.",
-            p.MAGNET_DIAMETER_MM,
-            features.magnet_diameter_mm,
-            p.tolerance_for("magnet_diameter"),
+            "magnet_pocket_length",
+            "Długość kieszeni paska magnetycznego zgodna ze specyfikacją.",
+            p.MAGNET_POCKET_LENGTH_MM,
+            features.magnet_pocket_length_mm,
+            p.tolerance_for("magnet_pocket_length"),
+        ),
+        _dimension_check(
+            "magnet_pocket_width",
+            "Szerokość kieszeni paska magnetycznego zgodna ze specyfikacją.",
+            p.MAGNET_POCKET_WIDTH_MM,
+            features.magnet_pocket_width_mm,
+            p.tolerance_for("magnet_pocket_width"),
         ),
         _dimension_check(
             "mounting_plate_size",
@@ -362,7 +369,8 @@ def build_report(
                 "model": _part_measurements_dict(base_measurements),
                 "features": {
                     "magnet_count": result.base.features.magnet_count,
-                    "magnet_diameter_mm": result.base.features.magnet_diameter_mm,
+                    "magnet_pocket_length_mm": result.base.features.magnet_pocket_length_mm,
+                    "magnet_pocket_width_mm": result.base.features.magnet_pocket_width_mm,
                     "magnet_positions_mm": [
                         list(pos) for pos in result.base.features.magnet_positions_mm
                     ],

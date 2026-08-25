@@ -539,3 +539,108 @@ Części A i całej Części B.
 użytkownika, z jawnym ujawnieniem konsekwencji montażowej (kolejność
 wklejania magnesów względem montażu do ścianki) przed implementacją, i z
 weryfikacją bezpośrednio na zbudowanej bryle, nie tylko na kodzie.
+
+## 2026-08-25 — v3: paski magnetyczne zamiast dysków (na wyraźne polecenie użytkownika)
+
+**Żądanie użytkownika**: magnesy w rzeczywistości nie są dyskami
+neodymowymi, tylko samoprzylepnymi paskami magnetycznymi z zestawu do
+identyfikatorów (12-częściowy zestaw, produkt z Amazon.pl, wymiar
+4×45×13mm), i płyta mocująca ma być pogrubiona tak, żeby zmieścić dwa
+takie paski.
+
+**Doprecyzowanie z użytkownikiem przed implementacją** (`AskUserQuestion`,
+zgodnie z `.claude/CLAUDE.md` — "Gdy specyfikacja jest niepełna lub
+sprzeczna"): oryginalne zdanie użytkownika było niejednoznaczne (ile
+kieszeni, ile pasków w kieszeni, czy paski zastępują dyski czy są
+dodatkowe, czy płyta może się powiększyć). Potwierdzone odpowiedzi:
+
+1. Paski **całkowicie zastępują** 4 dyski neodymowe (nie są dodatkiem).
+2. **Dwie kieszenie**, po **jednym pasku** w każdej (nie stos 2 pasków w
+   jednej kieszeni) — czyli 2 paski łącznie, każdy 4mm grubości.
+3. Płyta mocująca **może się powiększyć** ponad 60×60mm.
+
+**Konflikt inżynieryjny wykryty i ujawniony użytkownikowi przed zmianą
+`specs/`** (zgodnie z `.claude/CLAUDE.md`): pasek ma grubość 4mm (było
+3mm dla dysku), więc `mounting_plate_thickness` musi wzrosnąć z 4.0mm do
+5.0mm (reguła: `mounting_plate_thickness = magnet_thickness +
+magnet_pocket_wall_thickness`, 4+1=5). Ten parametr wchodzi jednak do
+stałego offsetu łańcucha wymiarowego Części B (patrz "Zależność
+geometryczna" w `spec.md`):
+
+```
+offset (v2.2) = mounting_plate_thickness(4) + nut_boss_length(44) + collar_length(10)
+              + cradle_transition_height(8.5) + u_wall_thickness(9)
+              + barrel_diameter_reference/2(10)
+              = 85.5 mm
+offset (v3, wall_to_barrel_center_min niezmienione) = 86.5 mm
+wysuw_min = wall_to_barrel_center_min(86.0) - offset(86.5) = -0.5 mm  ← NIEMOŻLIWE
+```
+
+Ujemny wysuw jest geometrycznie niemożliwy (mechanizm nie może wkręcić
+się "głębiej niż zero") — dokładnie ten sam rodzaj konfliktu co przy
+podnoszeniu `u_wall_thickness` w v2.1. Przedstawiono użytkownikowi przez
+`AskUserQuestion` z rekomendowaną opcją; użytkownik wybrał **podniesienie
+`wall_to_barrel_center_min` z 86.0mm do 87.0mm**, żeby przywrócić ten sam
++0.5mm zapasu co przed zmianą (zamiast zmniejszania innego parametru
+stałego offsetu, np. `nut_boss_length` czy `cradle_transition_height`,
+które są tam z innych, niezależnie wyprowadzonych powodów).
+
+**Układ kieszeni na płycie** (potwierdzony z użytkownikiem,
+rekomendowany wariant): dwie prostokątne kieszenie 45×13mm, dłuższym
+wymiarem równoległe do krawędzi płyty (oś X), wyśrodkowane w X (`x=0`),
+symetryczne w Y po przeciwnych stronach środka płyty/osi tulei
+gwintowanej — jedna nad, jedna pod. Wyprowadzenie liczb:
+
+* Tuleja gwintowana ma promień zewnętrzny `nut_boss_outer_diameter/2` =
+  (25 + 2×4)/2 = **16.5mm**. Żeby kieszeń (rzutowana na płaszczyznę
+  płyty) nie kolidowała z tuleją (ten sam wymóg co przy dyskach w v1–v2.2,
+  mimo że kieszenie i tuleja są fizycznie po przeciwnych stronach płyty —
+  zachowany dla spójności konstrukcyjnej/wizualnej), potrzeba:
+  `magnet_center_offset_y - magnet_pocket_width/2 > 16.5mm`.
+  Przyjęto `magnet_center_offset_y = 24.0mm` → najbliższa krawędź kieszeni
+  w odległości 24 - 6.5 = **17.5mm** od osi, czyli **1.0mm** prześwitu do
+  tulei.
+* Płyta musi pomieścić obie kieszenie z zapasem do krawędzi:
+  wzdłuż X potrzeba `mounting_plate_size/2 > magnet_pocket_length/2` (=
+  22.5mm), wzdłuż Y potrzeba `mounting_plate_size/2 >
+  magnet_center_offset_y + magnet_pocket_width/2` (= 30.5mm). Przyjęto
+  `mounting_plate_size = 72.0mm` (kwadrat) → zapas 13.5mm w X, 5.5mm w Y
+  do krawędzi płyty.
+
+**Zaimplementowane zmiany parametrów** (`specs/rifle-mount/parameters.yaml`):
+
+| Parametr | v2.2 | v3 |
+|---|---|---|
+| `magnet_diameter` (usunięty) → `magnet_pocket_length` / `magnet_pocket_width` | Ø12.0mm | 45.0×13.0mm |
+| `magnet_thickness` | 3.0mm | 4.0mm |
+| `magnet_count` | 4 | 2 |
+| `mounting_plate_size` | 60.0mm | 72.0mm |
+| `mounting_plate_thickness` | 4.0mm | 5.0mm |
+| `magnet_edge_offset` (usunięty) → `magnet_center_offset_y` | 10.0mm (od krawędzi) | 24.0mm (od środka) |
+| `wall_to_barrel_center_min` | 86.0mm | 87.0mm |
+
+**Implementacja** (`src/cad_project/rifle_mount/model.py::build_base_part`):
+sketch kieszeni magnesów zmieniony z `Circle(magnet_diameter/2)` na
+`Rectangle(magnet_pocket_length, magnet_pocket_width)`; `_magnet_positions()`
+zwraca teraz `((0, +magnet_center_offset_y), (0, -magnet_center_offset_y))`
+zamiast czterech narożników. Kierunek wiercenia (od strony zewnętrznej/
+przyściennej, `magnet_pocket_wall_thickness` materiału do wewnętrznej) —
+niezmieniony z v2.2.
+`check_engineering_preconditions()` (`parameters.py`) zastępuje stare
+sprawdzenia (promień/rozstaw dysków, kolizja z tuleją liczona z odległości
+promieniowej narożnika) nowymi sprawdzeniami dla prostokątnych kieszeni
+(brak nakładania w Y, mieszczenie się w płycie w X i Y, prześwit do tulei
+liczony jako najbliższa krawędź prostokąta wzdłuż osi Y, bo kieszeń
+rozciąga się przez `x=0`).
+
+**Bez zmian**: kierunek wiercenia kieszeni (v2.2), `magnet_pocket_wall_thickness`
+(1.0mm), wszystkie parametry Części B poza pochodną zmianą
+`wall_to_barrel_center_min` (stały offset łańcucha wymiarowego pozostaje
+z tą samą strukturą, tylko z nowym `mounting_plate_thickness`).
+
+**Uzasadnienie całości**: zmiana typu/kształtu/liczby magnesów na wyraźne
+życzenie użytkownika, z pełnym doprecyzowaniem niejednoznacznego żądania
+i pełnym ujawnieniem wykrytego konfliktu inżynieryjnego (ujemny wysuw
+minimalny) przed wprowadzeniem jakiejkolwiek zmiany w `specs/`, z liczbami
+wyprowadzonymi analitycznie (nie zgadniętymi) — zgodnie z
+`.claude/CLAUDE.md` ("Gdy specyfikacja jest niepełna lub sprzeczna").

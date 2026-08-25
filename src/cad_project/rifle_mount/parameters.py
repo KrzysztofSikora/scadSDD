@@ -38,13 +38,14 @@ _REQUIRED_PARAMETER_IDS = {
     "wall_to_barrel_center_min",
     "wall_to_barrel_center_max",
     "barrel_diameter_reference",
-    "magnet_diameter",
+    "magnet_pocket_length",
+    "magnet_pocket_width",
     "magnet_thickness",
     "magnet_count",
     "magnet_pocket_wall_thickness",
     "mounting_plate_size",
     "mounting_plate_thickness",
-    "magnet_edge_offset",
+    "magnet_center_offset_y",
     "plate_corner_fillet_radius",
     "thread_pitch",
     "thread_major_diameter",
@@ -161,13 +162,14 @@ UNITS: str = _DOCUMENT["project"]["units"]
 WALL_TO_BARREL_CENTER_MIN_MM: float = _PARAMETERS["wall_to_barrel_center_min"].value
 WALL_TO_BARREL_CENTER_MAX_MM: float = _PARAMETERS["wall_to_barrel_center_max"].value
 BARREL_DIAMETER_REFERENCE_MM: float = _PARAMETERS["barrel_diameter_reference"].value
-MAGNET_DIAMETER_MM: float = _PARAMETERS["magnet_diameter"].value
+MAGNET_POCKET_LENGTH_MM: float = _PARAMETERS["magnet_pocket_length"].value
+MAGNET_POCKET_WIDTH_MM: float = _PARAMETERS["magnet_pocket_width"].value
 MAGNET_THICKNESS_MM: float = _PARAMETERS["magnet_thickness"].value
 MAGNET_COUNT: int = int(_PARAMETERS["magnet_count"].value)
 MAGNET_POCKET_WALL_THICKNESS_MM: float = _PARAMETERS["magnet_pocket_wall_thickness"].value
 MOUNTING_PLATE_SIZE_MM: float = _PARAMETERS["mounting_plate_size"].value
 MOUNTING_PLATE_THICKNESS_MM: float = _PARAMETERS["mounting_plate_thickness"].value
-MAGNET_EDGE_OFFSET_MM: float = _PARAMETERS["magnet_edge_offset"].value
+MAGNET_CENTER_OFFSET_Y_MM: float = _PARAMETERS["magnet_center_offset_y"].value
 PLATE_CORNER_FILLET_RADIUS_MM: float = _PARAMETERS["plate_corner_fillet_radius"].value
 THREAD_PITCH_MM: float = _PARAMETERS["thread_pitch"].value
 THREAD_MAJOR_DIAMETER_MM: float = _PARAMETERS["thread_major_diameter"].value
@@ -218,30 +220,37 @@ def check_engineering_preconditions() -> None:
             f"magnet_pocket_wall_thickness ({MAGNET_THICKNESS_MM + MAGNET_POCKET_WALL_THICKNESS_MM} mm)."
         )
 
-    magnet_radius = MAGNET_DIAMETER_MM / 2
-    if magnet_radius >= MAGNET_EDGE_OFFSET_MM:
+    # v3: two rectangular pockets, centered in X (x=0), symmetric in Y at
+    # +-magnet_center_offset_y — see specs/rifle-mount/decisions.md
+    # ("v3 - paski magnetyczne zamiast dysków").
+    half_length = MAGNET_POCKET_LENGTH_MM / 2
+    half_width = MAGNET_POCKET_WIDTH_MM / 2
+    if half_width >= MAGNET_CENTER_OFFSET_Y_MM:
         raise SpecificationError(
-            f"Inconsistent specification: magnet_edge_offset ({MAGNET_EDGE_OFFSET_MM} mm) "
-            f"must be greater than the magnet radius ({magnet_radius} mm)."
+            "Inconsistent specification: magnet_center_offset_y "
+            f"({MAGNET_CENTER_OFFSET_Y_MM} mm) must be greater than half the pocket width "
+            f"({half_width} mm), otherwise the two symmetric pockets would overlap."
         )
-    magnet_center_spacing = MOUNTING_PLATE_SIZE_MM - 2 * MAGNET_EDGE_OFFSET_MM
-    if magnet_center_spacing <= MAGNET_DIAMETER_MM:
+    if half_length >= MOUNTING_PLATE_SIZE_MM / 2:
         raise SpecificationError(
-            "Inconsistent specification: adjacent magnet pockets would overlap "
-            f"(center spacing {magnet_center_spacing} mm <= magnet_diameter {MAGNET_DIAMETER_MM} mm)."
+            "Inconsistent specification: magnet_pocket_length "
+            f"({MAGNET_POCKET_LENGTH_MM} mm) does not fit within mounting_plate_size "
+            f"({MOUNTING_PLATE_SIZE_MM} mm)."
+        )
+    if MAGNET_CENTER_OFFSET_Y_MM + half_width >= MOUNTING_PLATE_SIZE_MM / 2:
+        raise SpecificationError(
+            "Inconsistent specification: a magnet pocket (center_offset_y "
+            f"{MAGNET_CENTER_OFFSET_Y_MM} mm + half width {half_width} mm) would extend "
+            f"past the plate edge (mounting_plate_size/2 = {MOUNTING_PLATE_SIZE_MM / 2} mm)."
         )
 
-    magnet_center_dist_from_axis = math.hypot(
-        MOUNTING_PLATE_SIZE_MM / 2 - MAGNET_EDGE_OFFSET_MM,
-        MOUNTING_PLATE_SIZE_MM / 2 - MAGNET_EDGE_OFFSET_MM,
-    )
-    nearest_pocket_edge = magnet_center_dist_from_axis - magnet_radius
+    nearest_pocket_edge = MAGNET_CENTER_OFFSET_Y_MM - half_width
     if nearest_pocket_edge <= NUT_BOSS_OUTER_DIAMETER_MM / 2:
         raise SpecificationError(
             "Inconsistent specification: magnet pockets would collide with the "
             f"threaded nut boss (nearest pocket edge {nearest_pocket_edge:.2f} mm from "
             f"axis <= boss radius {NUT_BOSS_OUTER_DIAMETER_MM / 2} mm). Increase "
-            "mounting_plate_size or reduce magnet_edge_offset/nut_wall_thickness."
+            "mounting_plate_size/magnet_center_offset_y or reduce nut_wall_thickness."
         )
 
     if COLLAR_DIAMETER_MM <= THREAD_MAJOR_DIAMETER_MM:

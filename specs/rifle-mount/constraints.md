@@ -21,9 +21,12 @@ wymiarami.
    wkręcanie) i ściśle mniejszy niż średnica zewnętrzna tulei
    (`thread_major_diameter + 2×nut_wall_thickness`), żeby mógł oprzeć się
    o jej czoło bez kolizji geometrycznej.
-4. **Magnesy nie mogą się nakładać.** Rozstaw między środkami sąsiednich
-   magnesów musi być większy niż `magnet_diameter`, inaczej kieszenie by
-   się przecinały.
+4. **Paski magnetyczne nie mogą się nakładać ani kolidować z tuleją.**
+   (v3) Dwie prostokątne kieszenie na paski magnetyczne muszą leżeć
+   symetrycznie po przeciwnych stronach środka płyty, bez wzajemnego
+   nakładania, bez wychodzenia poza krawędź płyty i bez kolizji z rzutem
+   tulei gwintowanej — patrz `spec.md` ("Reguły") i
+   `decisions.md` ("v3 — paski magnetyczne zamiast dysków").
 5. **Prześwit U musi mieć zapas.** `u_internal_width` musi być zauważalnie
    większy niż `barrel_diameter_reference` — to nie jest pasowanie
    precyzyjne, tylko swobodny wsuw (patrz `spec.md`).
