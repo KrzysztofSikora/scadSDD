@@ -13,7 +13,7 @@ wymiarami.
    złożenia.
 2. **Zazębienie gwintu.** `rod_threaded_length` musi zawsze zapewniać co
    najmniej `thread_engagement_length` rzeczywistego zazębienia w całym
-   zakresie regulacji (80–140 mm). To nie jest opcjonalny margines
+   zakresie regulacji (87–140 mm). To nie jest opcjonalny margines
    bezpieczeństwa — niedostateczne zazębienie oznacza, że część B może się
    wykręcić pod obciążeniem wysuniętej lufy.
 3. **Kołnierz jako ogranicznik.** `collar_diameter` musi być ściśle
@@ -50,12 +50,13 @@ nie zmienia tolerancji żeby przepchnąć walidację, itd.
   (rząd kilkunastu sekund na sam gwint) — patrz `decisions.md` po
   szczegóły wydajności i jak to uwzględniono w projekcie testów.
 * **Brak modelowania siły magnesów.** Model geometryczny nie weryfikuje,
-  czy 4× magnes Ø12×3mm faktycznie utrzyma karabin przy maksymalnym
-  wysięgu 140mm (to zależy od masy broni, grubości ścianki sejfu i klasy
-  magnesu N35/N42/N52, czego specyfikacja nie precyzuje) — to świadome
-  ograniczenie zakresu v1, nie błąd. Jeśli potrzebna weryfikacja
-  wytrzymałościowa, wymaga osobnej analizy inżynierskiej poza tym
-  repozytorium.
+  czy 2× pasek magnetyczny 45×13×4mm (od v3 — patrz `decisions.md` "v3 —
+  paski magnetyczne zamiast dysków") faktycznie utrzyma karabin przy
+  maksymalnym wysięgu 140mm (to zależy od masy broni, grubości ścianki
+  sejfu i siły przyciągania konkretnego paska, czego specyfikacja nie
+  precyzuje) — to świadome ograniczenie zakresu, nie błąd. Jeśli potrzebna
+  weryfikacja wytrzymałościowa, wymaga osobnej analizy inżynierskiej poza
+  tym repozytorium.
 * **Brak analizy wytrzymałości ścianek na zginanie.** Podobnie, model nie
   weryfikuje naprężeń w trzpieniu/tulei/kołnierzu przy maksymalnym
   wysięgu (140mm, moment gnący od masy karabinu) — to potencjalny
@@ -119,3 +120,22 @@ nie zmienia tolerancji żeby przepchnąć walidację, itd.
   użytkownika i nie jest wymogiem sprawdzanym przez
   `check_engineering_preconditions()` — czysto kosmetyczna/funkcjonalna
   różnica, nie błąd konstrukcyjny.
+
+## Znane ograniczenia i decyzje o zakresie (v3)
+
+* **Zakres regulacji nie jest już równy 86–140mm.** Zastąpienie czterech
+  dyskowych magnesów neodymowych dwoma paskami magnetycznymi (na wyraźne
+  polecenie użytkownika) pogrubiło `mounting_plate_thickness` (4→5mm, bo
+  pasek jest grubszy niż dysk), co wymagało podniesienia
+  `wall_to_barrel_center_min` z 86mm do 87mm, żeby zachować dodatni zapas
+  wysuwu trzpienia — patrz `specs/rifle-mount/decisions.md` ("v3 — paski
+  magnetyczne zamiast dysków"). Nowy zakres to 87–140mm.
+* **Kieszenie na paski magnetyczne są prostokątne, nie okrągłe, i jest ich
+  dwie zamiast czterech.** `magnet_pocket_length`/`magnet_pocket_width`
+  (45×13mm) zastępują `magnet_diameter` (Ø12mm); `magnet_center_offset_y`
+  (odległość środka kieszeni od środka płyty) zastępuje
+  `magnet_edge_offset` (odległość środka magnesu od krawędzi płyty) — te
+  dwa parametry nie są równoważne liczbowo, bo opisują inny układ
+  geometryczny (dwie kieszenie symetryczne względem środka, nie cztery w
+  narożnikach). Płyta mocująca urosła z 60×60mm do 72×72mm, żeby
+  pomieścić dłuższe kieszenie.

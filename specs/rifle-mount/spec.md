@@ -62,7 +62,7 @@ reorientation"). Składa się z **dwóch części**:
   kołnierzem oporowym i chwytem C na lufę.
 
 Wkręcanie/wykręcanie Części B w Część A reguluje odległość lufy od
-ścianki sejfu w zakresie **80–140 mm** (mierzone od powierzchni płyty
+ścianki sejfu w zakresie **87–140 mm** (mierzone od powierzchni płyty
 stykającej się ze ścianką do środka lufy spoczywającej w chwycie C).
 
 ## Parametry
@@ -605,11 +605,13 @@ generuje pliki dla **obu części osobno**:
       i osobno zaraportowany, bez blokowania eksportu STEP/STL),
 - [ ] wszystkie testy `pytest tests/rifle_mount/` przechodzą,
 - [ ] raport walidacji ma status `passed`.
-- [ ] **(v2.1)** zakres regulacji to dokładnie 86–140mm (podniesiony z
-      80mm w v2.1 na potrzeby masywniejszego chwytu C — patrz
-      `decisions.md`),
+- [ ] **(v3)** zakres regulacji to dokładnie 87–140mm (podniesiony z
+      86mm w v3 na potrzeby grubszej płyty mocującej z paskami
+      magnetycznymi — patrz `decisions.md`),
 - [ ] **(v2)** przejście kołnierz → chwyt C nie ma nawisu > 45° od pionu
       (samo-podpierające, drukowalne bez podpór),
 - [ ] **(v2.1)** `u_wall_thickness` (ścianka/ramiona chwytu C) = 9.0mm.
 - [ ] **(v2.2)** kieszenie na magnesy w Części A są otwarte od strony
       zewnętrznej (przyściennej), nie wewnętrznej.
+- [ ] **(v3)** dwie kieszenie 45×13×4mm na paski magnetyczne (nie cztery
+      kieszenie Ø12×3mm na dyski), płyta mocująca 72×72×5mm.

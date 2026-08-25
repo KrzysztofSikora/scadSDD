@@ -218,13 +218,14 @@ mypy src
 Pełna specyfikacja: [`specs/rifle-mount/spec.md`](specs/rifle-mount/spec.md)
 (+ `parameters.yaml`, `constraints.md`, `decisions.md` w tym samym
 katalogu). Uchwyt mocowany magnetycznie do metalowej ścianki sejfu,
-przytrzymujący lufę karabinu w regulowanym zakresie 80–140 mm od ścianki.
+przytrzymujący lufę karabinu w regulowanym zakresie 87–140 mm od ścianki.
 Składa się z **dwóch fizycznie osobnych części** skręcanych ze sobą:
 
-* **`base`** — kwadratowa płyta (60×60×4mm) z czterema magnesami
-  neodymowymi Ø12×3mm i tuleją z gwintem wewnętrznym,
+* **`base`** — kwadratowa płyta (72×72×5mm) z dwoma paskami
+  magnetycznymi 45×13×4mm (samoprzylepne paski do identyfikatorów, nie
+  dyski neodymowe) i tuleją z gwintem wewnętrznym,
 * **`arm`** — gwintowany trzpień + kołnierz oporowy + chwyt w kształcie
-  litery U na lufę (prześwit 30mm, z rowkiem na wkładkę ochronną).
+  litery C na lufę (prześwit 30mm, z rowkiem na wkładkę ochronną).
 
 Gwint (skok 4mm, Ø25mm, kąt 29° jak ACME) jest **prawdziwą, drukowalną
 geometrią** wygenerowaną biblioteką
@@ -275,7 +276,7 @@ pytest tests/rifle_mount/ -v
 * Walidacja geometrii **nie sprawdza** wytrzymałości mechanicznej (siły
   magnesów, naprężeń przy maksymalnym wysięgu 140mm) — to świadome
   ograniczenie zakresu v1, nie błąd.
-* Chwyt U jest zamodelowany jako prosty prostokątny rowek (nie zaokrąglony
+* Chwyt C jest zamodelowany jako prosty prostokątny rowek (nie zaokrąglony
   łuk dopasowany do lufy) — decyzja opisana w `decisions.md`, nie zmienia
   wyprowadzenia zakresu regulacji.
 
