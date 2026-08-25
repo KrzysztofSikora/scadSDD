@@ -2,7 +2,7 @@
   "status": "passed",
   "spec_version": "2.2.0",
   "model_id": "magnetic-rifle-mount-001",
-  "generated_at": "2026-08-21T12:34:34.653758+00:00",
+  "generated_at": "2026-08-25T21:07:02.363838+00:00",
   "parts": {
     "base": {
       "model": {
@@ -288,29 +288,29 @@
     "base": {
       "step": {
         "status": "passed",
-        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/step/base.step"
+        "path": "/home/user/scadSDD/output/rifle-mount/step/base.step"
       },
       "stl": {
         "status": "passed",
-        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/stl/base.stl"
+        "path": "/home/user/scadSDD/output/rifle-mount/stl/base.stl"
       },
       "preview": {
         "status": "passed",
-        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/previews/base.png"
+        "path": "/home/user/scadSDD/output/rifle-mount/previews/base.png"
       }
     },
     "arm": {
       "step": {
         "status": "passed",
-        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/step/arm.step"
+        "path": "/home/user/scadSDD/output/rifle-mount/step/arm.step"
       },
       "stl": {
         "status": "passed",
-        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/stl/arm.stl"
+        "path": "/home/user/scadSDD/output/rifle-mount/stl/arm.stl"
       },
       "preview": {
         "status": "passed",
-        "path": "/home/krzysztof/projects/scadSDD/output/rifle-mount/previews/arm.png"
+        "path": "/home/user/scadSDD/output/rifle-mount/previews/arm.png"
       }
     }
   }

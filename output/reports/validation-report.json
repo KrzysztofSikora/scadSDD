@@ -2,7 +2,7 @@
   "status": "passed",
   "spec_version": "1.0.0",
   "model_id": "bracket-001",
-  "generated_at": "2026-07-29T09:44:14.152880+00:00",
+  "generated_at": "2026-08-25T21:04:37.994374+00:00",
   "model": {
     "solid_count": 1,
     "is_valid": true,
@@ -155,15 +155,15 @@
   "exports": {
     "step": {
       "status": "passed",
-      "path": "/home/krzysztof/projects/scadSDD/output/step/model.step"
+      "path": "/home/user/scadSDD/output/step/model.step"
     },
     "stl": {
       "status": "passed",
-      "path": "/home/krzysztof/projects/scadSDD/output/stl/model.stl"
+      "path": "/home/user/scadSDD/output/stl/model.stl"
     },
     "preview": {
       "status": "passed",
-      "path": "/home/krzysztof/projects/scadSDD/output/previews/model.png"
+      "path": "/home/user/scadSDD/output/previews/model.png"
     }
   }
 }
