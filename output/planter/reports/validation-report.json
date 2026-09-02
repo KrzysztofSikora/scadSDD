@@ -1,0 +1,278 @@
+{
+  "status": "passed",
+  "spec_version": "1.0.0",
+  "model_id": "self-watering-planter-001",
+  "generated_at": "2026-09-02T21:02:18.509097+00:00",
+  "parts": {
+    "insert": {
+      "model": {
+        "solid_count": 1,
+        "is_valid": true,
+        "volume_mm3": 158407.84334005695,
+        "surface_area_mm2": 135048.54762811988,
+        "bounding_box_mm": {
+          "x": 129.95596707492797,
+          "y": 129.95596717492796,
+          "z": 155.0000001
+        },
+        "mass_kg": 0.42770117701815374
+      },
+      "features": {
+        "top_outer_diameter_mm": 130.0,
+        "bottom_outer_diameter_mm": 126.0,
+        "body_height_mm": 110.0,
+        "drainage_hole_count": 8,
+        "pattern_flute_count": 24
+      }
+    },
+    "reservoir": {
+      "model": {
+        "solid_count": 1,
+        "is_valid": true,
+        "volume_mm3": 64923.056703216214,
+        "surface_area_mm2": 44743.49229385742,
+        "bounding_box_mm": {
+          "x": 111.0,
+          "y": 106.0,
+          "z": 59.0
+        },
+        "mass_kg": 0.17529225309868376
+      },
+      "features": {
+        "mouth_inner_diameter_mm": 100.0,
+        "cavity_depth_mm": 40.0,
+        "foot_count": 3
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "insert_solid_count",
+      "description": "Cz\u0119\u015b\u0107 'insert' sk\u0142ada si\u0119 z dok\u0142adnie jednej bry\u0142y.",
+      "expected": 1,
+      "actual": 1,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "insert_geometry_valid",
+      "description": "Bry\u0142a 'insert' przechodzi test poprawno\u015bci OCCT.",
+      "expected": true,
+      "actual": true,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "insert_volume_positive",
+      "description": "Bry\u0142a 'insert' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
+      "expected": "> 0",
+      "actual": 158407.84334005695,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "reservoir_solid_count",
+      "description": "Cz\u0119\u015b\u0107 'reservoir' sk\u0142ada si\u0119 z dok\u0142adnie jednej bry\u0142y.",
+      "expected": 1,
+      "actual": 1,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "reservoir_geometry_valid",
+      "description": "Bry\u0142a 'reservoir' przechodzi test poprawno\u015bci OCCT.",
+      "expected": true,
+      "actual": true,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "reservoir_volume_positive",
+      "description": "Bry\u0142a 'reservoir' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
+      "expected": "> 0",
+      "actual": 64923.056703216214,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "insert_top_outer_diameter",
+      "description": "\u015arednica g\u00f3rna wk\u0142adu zgodna ze specyfikacj\u0105.",
+      "expected": 130.0,
+      "actual": 130.0,
+      "tolerance": 0.3,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "insert_bottom_outer_diameter",
+      "description": "\u015arednica dolna wk\u0142adu zgodna ze specyfikacj\u0105.",
+      "expected": 126.0,
+      "actual": 126.0,
+      "tolerance": 0.3,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "insert_body_height",
+      "description": "Wysoko\u015b\u0107 wk\u0142adu zgodna ze specyfikacj\u0105.",
+      "expected": 110.0,
+      "actual": 110.0,
+      "tolerance": 0.3,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "drainage_hole_count",
+      "description": "Liczba otwor\u00f3w drena\u017cowych zgodna ze specyfikacj\u0105.",
+      "expected": 8,
+      "actual": 8,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "pattern_flute_count",
+      "description": "Liczba \u017c\u0142obie\u0144 wzoru \u015bcianki zgodna ze specyfikacj\u0105.",
+      "expected": 24,
+      "actual": 24,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "capillary_tube_outer_diameter",
+      "description": "\u015arednica zewn\u0119trzna rdzenia kapilarnego zgodna ze specyfikacj\u0105.",
+      "expected": 24.0,
+      "actual": 24.0,
+      "tolerance": 0.3,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "reservoir_mouth_inner_diameter",
+      "description": "Wewn\u0119trzna \u015brednica zbiornika zgodna ze specyfikacj\u0105.",
+      "expected": 100.0,
+      "actual": 100.0,
+      "tolerance": 0.3,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "reservoir_cavity_depth",
+      "description": "G\u0142\u0119boko\u015b\u0107 komory zbiornika zgodna ze specyfikacj\u0105.",
+      "expected": 40.0,
+      "actual": 40.0,
+      "tolerance": 0.3,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "reservoir_foot_count",
+      "description": "Liczba n\u00f3\u017cek zbiornika zgodna ze specyfikacj\u0105.",
+      "expected": 3,
+      "actual": 3,
+      "tolerance": 0,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "spigot_fits_reservoir_mouth",
+      "description": "Sp\u00f3dnica wk\u0142adu mie\u015bci si\u0119 (na wcisk) w gardzieli zbiornika.",
+      "expected": "0 < spigot_outer_diameter < insert_bottom_outer_diameter",
+      "actual": 99.4,
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "rebuild_succeeds",
+      "description": "Oba elementy daj\u0105 si\u0119 odbudowa\u0107 bez b\u0142\u0119du.",
+      "expected": "no exception",
+      "actual": "no exception",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "rebuild_deterministic",
+      "description": "Dwa niezale\u017cne budowania daj\u0105 identyczne pomiary i cechy dla obu cz\u0119\u015bci.",
+      "expected": "identical",
+      "actual": "identical",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "insert_export_step_exists",
+      "description": "insert export step exists succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "insert_export_stl_exists",
+      "description": "insert export stl exists succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "reservoir_export_step_exists",
+      "description": "reservoir export step exists succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "id": "reservoir_export_stl_exists",
+      "description": "reservoir export stl exists succeeded and produced a non-empty file.",
+      "expected": "passed",
+      "actual": "passed",
+      "tolerance": null,
+      "status": "passed",
+      "message": ""
+    }
+  ],
+  "exports": {
+    "insert": {
+      "step": {
+        "status": "passed",
+        "path": "/home/user/scadSDD/output/planter/step/insert.step"
+      },
+      "stl": {
+        "status": "passed",
+        "path": "/home/user/scadSDD/output/planter/stl/insert.stl"
+      },
+      "preview": {
+        "status": "passed",
+        "path": "/home/user/scadSDD/output/planter/previews/insert.png"
+      }
+    },
+    "reservoir": {
+      "step": {
+        "status": "passed",
+        "path": "/home/user/scadSDD/output/planter/step/reservoir.step"
+      },
+      "stl": {
+        "status": "passed",
+        "path": "/home/user/scadSDD/output/planter/stl/reservoir.stl"
+      },
+      "preview": {
+        "status": "passed",
+        "path": "/home/user/scadSDD/output/planter/previews/reservoir.png"
+      }
+    }
+  }
+}

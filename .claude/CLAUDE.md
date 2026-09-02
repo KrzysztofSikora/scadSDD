@@ -14,6 +14,7 @@ plików drugiego:
 |---|---|---|---|
 | Uchwyt montażowy (`bracket-001`) | `specs/spec.md`, `specs/parameters.yaml` | `src/cad_project/{parameters,model}.py` | `python -m cad_project.cli` |
 | Magnetyczny uchwyt na lufę (`magnetic-rifle-mount-001`) | `specs/rifle-mount/spec.md`, `specs/rifle-mount/parameters.yaml` | `src/cad_project/rifle_mount/{parameters,model}.py` | `python -m cad_project.rifle_mount.cli` |
+| Doniczka premium z samonawadnianiem (`self-watering-planter-001`) | `specs/planter/spec.md`, `specs/planter/parameters.yaml` | `src/cad_project/planter/{parameters,model}.py` | `python -m cad_project.planter.cli` |
 
 Moduły `measurements.py`, `exports.py`, `rendering.py` w
 `src/cad_project/` są **generyczne** (biorą dowolny Build123d `Part`) i są
@@ -89,22 +90,27 @@ parametry.
 
 ## Architektura (gdzie co jest)
 
-| Warstwa                  | Uchwyt montażowy                        | Uchwyt na lufę (rifle_mount)                     |
-|---------------------------|-------------------------------------------|----------------------------------------------------|
-| Parametry (jedno źródło)  | `src/cad_project/parameters.py`            | `src/cad_project/rifle_mount/parameters.py`         |
-| Geometria (Build123d)     | `src/cad_project/model.py`                 | `src/cad_project/rifle_mount/model.py`              |
-| Walidacja                 | `src/cad_project/validation.py`            | `src/cad_project/rifle_mount/validation.py`         |
-| CLI                       | `src/cad_project/cli.py`                   | `src/cad_project/rifle_mount/cli.py`                |
-| Pomiary/Eksport/Podgląd   | `measurements.py`/`exports.py`/`rendering.py` (generyczne, **współdzielone** przez oba modele) |||
+| Warstwa                  | Uchwyt montażowy                        | Uchwyt na lufę (rifle_mount)                     | Doniczka (planter)                              |
+|---------------------------|-------------------------------------------|----------------------------------------------------|---------------------------------------------------|
+| Parametry (jedno źródło)  | `src/cad_project/parameters.py`            | `src/cad_project/rifle_mount/parameters.py`         | `src/cad_project/planter/parameters.py`            |
+| Geometria (Build123d)     | `src/cad_project/model.py`                 | `src/cad_project/rifle_mount/model.py`              | `src/cad_project/planter/model.py`                 |
+| Walidacja                 | `src/cad_project/validation.py`            | `src/cad_project/rifle_mount/validation.py`         | `src/cad_project/planter/validation.py`            |
+| CLI                       | `src/cad_project/cli.py`                   | `src/cad_project/rifle_mount/cli.py`                | `src/cad_project/planter/cli.py`                   |
+| Pomiary/Eksport/Podgląd   | `measurements.py`/`exports.py`/`rendering.py` (generyczne, **współdzielone** przez wszystkie modele) |||
 
 `build_model()` w każdym `model.py` **nigdy** nie eksportuje ani nie
-renderuje — zwraca wyłącznie metadane cech (`ModelResult`/`RifleMountResult`
-+ `*Features`). Eksport/render są zawsze jawne (CLI albo skrypt), nigdy
-efektem ubocznym importu modułu.
+renderuje — zwraca wyłącznie metadane cech (`ModelResult`/`RifleMountResult`/
+`PlanterResult` + `*Features`). Eksport/render są zawsze jawne (CLI albo
+skrypt), nigdy efektem ubocznym importu modułu.
 
 Model uchwytu na lufę ma **dwie fizycznie osobne części** (base + arm) —
 `build_model()` zwraca oba `Part`y razem z osobnymi metadanymi cech; patrz
-`specs/rifle-mount/constraints.md`.
+`specs/rifle-mount/constraints.md`. Model doniczki też ma **dwie fizycznie
+osobne części** (insert + reservoir) — patrz `specs/planter/constraints.md`.
+W doniczce tylko jeden fragment geometrii (`_carve_wall_pattern()` w
+`model.py`, parametry `pattern_*`) jest przeznaczony do wymiany między
+przyszłymi wariantami serii — reszta wymiarów ma pozostać identyczna, patrz
+`specs/planter/decisions.md` ("Architektura wymiennego wzoru").
 
 ## Uruchamianie
 
@@ -123,6 +129,11 @@ Uchwyt na lufę (te same komendy, osobny CLI, wolniejszy build — patrz niżej)
 python -m cad_project.rifle_mount.cli all
 ```
 
+Doniczka (te same komendy, osobny CLI, szybki build jak uchwyt montażowy):
+```bash
+python -m cad_project.planter.cli all
+```
+
 ```bash
 pytest tests/ -v
 ruff check src tests
@@ -130,7 +141,8 @@ mypy src
 ```
 
 Albo równoważnie `make build|validate|test|lint|typecheck|render|all|clean`
-oraz `make rifle-build|rifle-validate|rifle-render|rifle-all|rifle-clean`.
+oraz `make rifle-build|rifle-validate|rifle-render|rifle-all|rifle-clean`
+oraz `make planter-build|planter-validate|planter-render|planter-all|planter-clean`.
 
 **Uwaga o wydajności**: model uchwytu na lufę używa prawdziwego,
 drukowalnego gwintu (`bd_warehouse`, sweep helikalny w OCCT) — pełne

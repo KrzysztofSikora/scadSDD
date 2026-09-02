@@ -1,5 +1,6 @@
 .PHONY: setup build validate test lint typecheck render view all clean \
-	rifle-build rifle-validate rifle-render rifle-all rifle-clean rifle-view
+	rifle-build rifle-validate rifle-render rifle-all rifle-clean rifle-view \
+	planter-build planter-validate planter-render planter-all planter-clean planter-view
 
 VENV_PYTHON := .venv/bin/python
 VENV_PYTEST := .venv/bin/pytest
@@ -55,3 +56,23 @@ rifle-clean:
 
 rifle-view:
 	bash scripts/view.sh output/rifle-mount/step/base.step output/rifle-mount/step/arm.step
+
+# --- Premium self-watering planter (independent third model) ---------------
+
+planter-build:
+	$(VENV_PYTHON) -m cad_project.planter.cli build
+
+planter-validate:
+	$(VENV_PYTHON) -m cad_project.planter.cli validate
+
+planter-render:
+	$(VENV_PYTHON) -m cad_project.planter.cli render
+
+planter-all:
+	$(VENV_PYTHON) -m cad_project.planter.cli all
+
+planter-clean:
+	$(VENV_PYTHON) -m cad_project.planter.cli clean
+
+planter-view:
+	bash scripts/view.sh output/planter/step/insert.step output/planter/step/reservoir.step

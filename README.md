@@ -5,7 +5,7 @@ Lokalnie działający system Spec-Driven Development dla CAD: specyfikacja w
 [Build123d](https://build123d.readthedocs.io/), a automatyczna walidacja
 porównuje wynikowy model z wymaganiami i zapisuje raport JSON.
 
-To repozytorium hostuje **dwa niezależne modele**, każdy ze swoją
+To repozytorium hostuje **trzy niezależne modele**, każdy ze swoją
 specyfikacją, kodem, testami i CLI:
 
 1. **Uchwyt montażowy** (`bracket-001`) — prosta płyta z czterema otworami
@@ -14,6 +14,10 @@ specyfikacją, kodem, testami i CLI:
    (`magnetic-rifle-mount-001`) — dwuczęściowy, regulowany uchwyt z
    prawdziwym, drukowalnym gwintem. Zobacz
    [„Drugi model: magnetyczny uchwyt na lufę"](#drugi-model-magnetyczny-uchwyt-na-lufę-karabinu) niżej.
+3. **Doniczka premium z samonawadnianiem** (`self-watering-planter-001`)
+   — dwuczęściowa doniczka (wkład + zbiornik) do sprzedaży jako pliki STL,
+   z żłobioną ścianką (jedyny element wymienny między wariantami serii).
+   Zobacz [„Trzeci model: doniczka premium z samonawadnianiem"](#trzeci-model-doniczka-premium-z-samonawadnianiem) niżej.
 
 ## Dlaczego specyfikacja jest źródłem prawdy
 
@@ -280,6 +284,52 @@ pytest tests/rifle_mount/ -v
   łuk dopasowany do lufy) — decyzja opisana w `decisions.md`, nie zmienia
   wyprowadzenia zakresu regulacji.
 
+## Trzeci model: doniczka premium z samonawadnianiem
+
+Pełna specyfikacja: [`specs/planter/spec.md`](specs/planter/spec.md)
+(+ `parameters.yaml`, `constraints.md`, `decisions.md` w tym samym
+katalogu). Doniczka do sprzedaży jako pliki STL, dwuczęściowa:
+
+* **`insert`** — stożkowa donica na ziemię (Ø130mm góra, Ø126mm dół,
+  wys. 110mm), z żłobioną ścianką zewnętrzną (24 pionowe żłobienia),
+  perforowanym rdzeniem kapilarnym (użytkownik wypełnia go ziemią —
+  patrz zastrzeżenie niżej) i 8 otworami drenażowymi w dnie,
+* **`reservoir`** — płytki zbiornik na wodę (Ø100mm wewnątrz, gł. 40mm),
+  z zewnętrznym dziubkiem do nalewania i otworem przelewowym.
+
+Insert opiera się na zbiorniku na wcisk (cienkościenna spódnica wchodząca
+w gardziel zbiornika) — bez kleju, bez gwintu, łatwy do zdjęcia przy
+przesadzaniu lub kontroli poziomu wody.
+
+**Zastrzeżenie fizyczne**: rdzeń kapilarny to perforowana rura, nie lity
+knot — to **ziemia wewnątrz rury** (nie sam plastik) faktycznie podciąga
+wilgoć. Kapilarne wznoszenie wody przez gołą, niehydrofilową ściankę
+PLA/PETG na odległość rzędu centymetrów jest fizycznie wątpliwe — patrz
+`specs/planter/constraints.md` ("Brak gwarancji podciągania wody przez
+sam plastik") po pełne wyjaśnienie.
+
+**Architektura serii**: wszystkie wymiary poza blokiem `pattern_*` w
+`parameters.yaml` (i funkcją `_carve_wall_pattern()` w `model.py`) są
+**wspólnym rdzeniem** — mają pozostać identyczne we wszystkich przyszłych
+wariantach serii. Nowy wariant wzoru ściany = nowa implementacja tej
+jednej funkcji + nowy blok `pattern_*`, bez ruszania reszty modelu. Patrz
+`specs/planter/decisions.md` ("Architektura wymiennego wzoru").
+
+Komendy (własny CLI, ta sama składnia co pozostałe modele, szybki build
+jak uchwyt montażowy — proste operacje boolowskie, bez gwintu):
+
+```bash
+python -m cad_project.planter.cli build      # zbuduj obie części, brak eksportu
+python -m cad_project.planter.cli export     # eksportuj STEP/STL obu części
+python -m cad_project.planter.cli render     # podgląd PNG obu części
+python -m cad_project.planter.cli validate   # zmierz + zwaliduj + raport
+python -m cad_project.planter.cli all        # pełny pipeline
+# albo: make planter-build|planter-validate|planter-render|planter-all|planter-clean
+```
+
+Wyniki trafiają do `output/planter/{step,stl,previews,reports,logs}/`.
+Testy tylko dla tego modelu: `pytest tests/planter/ -v`.
+
 ## Struktura katalogów
 
 ```text
@@ -293,7 +343,8 @@ pytest tests/rifle_mount/ -v
 │   ├── parameters.yaml       #   maszynowe źródło wartości (jedyne)
 │   ├── constraints.md        #   ograniczenia inżynieryjne/procesowe
 │   ├── decisions.md          #   log decyzji technicznych
-│   └── rifle-mount/          #   ŹRÓDŁO PRAWDY dla uchwytu na lufę (ten sam wzorzec 4 plików)
+│   ├── rifle-mount/          #   ŹRÓDŁO PRAWDY dla uchwytu na lufę (ten sam wzorzec 4 plików)
+│   └── planter/              #   ŹRÓDŁO PRAWDY dla doniczki (ten sam wzorzec 4 plików)
 ├── src/cad_project/        # Kod
 │   ├── parameters.py          #   wczytuje parameters.yaml, jedno źródło stałych
 │   ├── model.py               #   geometria Build123d, build_model() -> ModelResult
@@ -302,12 +353,14 @@ pytest tests/rifle_mount/ -v
 │   ├── exports.py             #   eksport STEP/STL (generyczne, współdzielone)
 │   ├── rendering.py           #   podgląd PNG, headless matplotlib (generyczne, współdzielone)
 │   ├── cli.py                 #   build/export/render/validate/all/clean
-│   └── rifle_mount/           #   drugi model: parameters.py, model.py, validation.py, cli.py
-├── tests/                  # pytest (+ tests/rifle_mount/ dla drugiego modelu)
+│   ├── rifle_mount/           #   drugi model: parameters.py, model.py, validation.py, cli.py
+│   └── planter/               #   trzeci model: parameters.py, model.py, validation.py, cli.py
+├── tests/                  # pytest (+ tests/rifle_mount/, tests/planter/ dla pozostałych modeli)
 ├── scripts/                # setup.sh, build.sh, validate.sh, render.sh, view.sh, clean.sh
 ├── output/                 # Wyniki generowane automatycznie (ignorowane przez git poza .gitkeep)
 │   ├── step/ stl/ previews/ reports/ logs/       (uchwyt montażowy)
-│   └── rifle-mount/{step,stl,previews,reports,logs}/  (uchwyt na lufę)
+│   ├── rifle-mount/{step,stl,previews,reports,logs}/  (uchwyt na lufę)
+│   └── planter/{step,stl,previews,reports,logs}/      (doniczka)
 ├── docs/mcp-roadmap.md      # Plan na przyszłość dla serwera MCP
 ├── pyproject.toml, Makefile, .gitignore
 └── README.md, CHANGELOG.md

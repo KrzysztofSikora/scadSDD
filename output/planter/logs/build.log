@@ -1,0 +1,9 @@
+2026-09-02 21:02:11,147 [INFO] Running full pipeline (build -> measure -> validate -> export -> render -> report)...
+2026-09-02 21:02:13,868 [INFO] insert STEP export: passed -> /home/user/scadSDD/output/planter/step/insert.step
+2026-09-02 21:02:13,869 [INFO] reservoir STEP export: passed -> /home/user/scadSDD/output/planter/step/reservoir.step
+2026-09-02 21:02:13,869 [INFO] insert STL export: passed -> /home/user/scadSDD/output/planter/stl/insert.stl
+2026-09-02 21:02:13,869 [INFO] reservoir STL export: passed -> /home/user/scadSDD/output/planter/stl/reservoir.stl
+2026-09-02 21:02:16,054 [INFO] Preview (insert) rendered: /home/user/scadSDD/output/planter/previews/insert.png
+2026-09-02 21:02:16,054 [INFO] Preview (reservoir) rendered: /home/user/scadSDD/output/planter/previews/reservoir.png
+2026-09-02 21:02:18,510 [INFO] Validation report written to /home/user/scadSDD/output/planter/reports/validation-report.json
+2026-09-02 21:02:18,510 [INFO] Validation status: passed

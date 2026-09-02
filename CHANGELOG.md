@@ -3,6 +3,37 @@
 Format oparty na [Keep a Changelog](https://keepachangelog.com/), wersje wg
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] — 2026-09-02
+
+### Dodano
+
+- Trzeci, niezależny model: **doniczka premium z samonawadnianiem**
+  (`self-watering-planter-001`), dwuczęściowa (insert + reservoir), do
+  sprzedaży jako pliki STL na Etsy. Rozmiar bazowy dobrany na podstawie
+  researchu popularnych samonawadniających doniczek STL (WebSearch).
+  - Specyfikacja: `specs/planter/{spec.md,parameters.yaml,constraints.md,decisions.md}`.
+  - Kod: `src/cad_project/planter/{parameters,model,validation,cli}.py`
+    — reużywa generyczne `measurements.py`/`exports.py`/`rendering.py`.
+  - Wyjście: osobne drzewo `output/planter/{step,stl,previews,reports,logs}/`.
+  - Testy: `tests/planter/` (26 testów, fixture sesyjna w `conftest.py`).
+  - Makefile: `planter-build`, `planter-validate`, `planter-render`,
+    `planter-all`, `planter-clean`, `planter-view`.
+  - Mechanizm samonawadniania: perforowany rdzeń kapilarny (użytkownik
+    wypełnia go ziemią — to ziemia, nie sam plastik, faktycznie podciąga
+    wilgoć, patrz `specs/planter/constraints.md`), zewnętrzny dziubek do
+    nalewania, otwór przelewowy.
+  - Architektura wymiennego wzoru: zewnętrzna ścianka insertu (żłobienia
+    "premium fluted" w v1) jest jedynym elementem geometrii
+    przeznaczonym do podmiany między przyszłymi wariantami serii —
+    reszta wymiarów ma pozostać identyczna, patrz
+    `specs/planter/decisions.md` ("Architektura wymiennego wzoru").
+- `.claude/CLAUDE.md` zaktualizowany o tabelę trzech modeli w repozytorium.
+
+### Zmieniono
+
+- `pyproject.toml`: wersja pakietu 0.2.0 → 0.3.0, opis projektu
+  zaktualizowany o trzeci model.
+
 ## [0.2.0] — 2026-07-28
 
 ### Dodano

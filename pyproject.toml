@@ -1,7 +1,7 @@
 [project]
 name = "cad-project"
-version = "0.2.0"
-description = "Spec-Driven Development sample project: parametric Build123d models (mounting bracket, magnetic rifle mount)."
+version = "0.3.0"
+description = "Spec-Driven Development sample project: parametric Build123d models (mounting bracket, magnetic rifle mount, self-watering planter)."
 requires-python = ">=3.12"
 dependencies = [
     "build123d>=0.9",

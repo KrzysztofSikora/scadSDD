@@ -1,0 +1,350 @@
+# Machine-readable parameter source for the "Premium Self-Watering Planter".
+#
+# THIS FILE IS THE AUTHORITATIVE SOURCE OF TRUTH FOR ALL NUMERIC VALUES.
+#
+# specs/planter/spec.md contains a human-readable parameter table that
+# must mirror this file exactly (fenced ```yaml block, checked by
+# tests/planter/test_spec_compliance.py with a real YAML parser, never
+# regex). src/cad_project/planter/parameters.py loads this file directly
+# at runtime.
+#
+# See specs/planter/decisions.md for how these values were derived (Etsy
+# market sizing research, spout/insert clearance derivation, capillary
+# tube sizing).
+
+project:
+  name: "Premium Self-Watering Planter"
+  model_id: "self-watering-planter-001"
+  spec_version: "1.0.0"
+  units: "mm"
+
+parameters:
+  # --- Insert ("wkład") -------------------------------------------------
+  - id: insert_top_outer_diameter
+    name: "Średnica zewnętrzna wkładu (góra)"
+    value: 130.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Średnica zewnętrzna wkładu na ziemię przy górnej krawędzi. Dobrana
+      na podstawie researchu najpopularniejszych samonawadniających
+      doniczek STL na Etsy (typowy zakres ok. 90-140mm) — patrz
+      specs/planter/decisions.md ("Wybór rozmiaru bazowego serii").
+
+  - id: insert_bottom_outer_diameter
+    name: "Średnica zewnętrzna wkładu (dół, przy oparciu)"
+    value: 126.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Średnica zewnętrzna wkładu przy dolnej krawędzi (tam gdzie wkład
+      opiera się na zbiorniku). Celowo bliska insert_top_outer_diameter
+      (subtelne zwężenie, ~1° kąta), żeby zostawić bezpieczny margines
+      między rozszerzającą się ścianką wkładu a dziubkiem do nalewania
+      wody (fill_spout_*) zamontowanym na zbiorniku poniżej — patrz
+      wyprowadzenie w specs/planter/decisions.md.
+
+  - id: insert_body_height
+    name: "Wysokość ścianki wkładu"
+    value: 110.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Wysokość stożkowej ścianki wkładu, licząc od dolnej krawędzi
+      (płaszczyzna oparcia na zbiorniku, Z=0) do górnej krawędzi.
+
+  - id: insert_wall_thickness
+    name: "Grubość ścianki wkładu"
+    value: 2.4
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Grubość ścianki wkładu (i spódnicy pozycjonującej pod spodem) —
+      ok. 6 obwodów przy dyszy 0.4mm, standard dla solidnej doniczki.
+
+  - id: insert_floor_thickness
+    name: "Grubość dna wkładu"
+    value: 4.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Grubość dna wkładu (pogrubiona względem ścianki bocznej, żeby
+      solidnie utrzymać otwory drenażowe i rdzeń kapilarny) — dobudowana
+      jako dodatkowa warstwa wewnątrz po operacji shell, patrz model.py.
+
+  - id: top_rim_fillet_radius
+    name: "Promień zaokrąglenia górnej krawędzi wkładu"
+    value: 1.2
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Zaokrąglenie tylko zewnętrznej krawędzi górnego otworu wkładu (nie
+      wewnętrznej — przy grubości ścianki 2.4mm zaokrąglenie obu krawędzi
+      naraz jest geometrycznie niewykonalne na tak wąskiej powierzchni
+      czołowej; zweryfikowane bezpośrednio budową w
+      specs/planter/decisions.md).
+
+  - id: drainage_hole_diameter
+    name: "Średnica otworu drenażowego/wentylacyjnego"
+    value: 4.0
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Średnica każdego z otworów w dnie wkładu (napowietrzenie/drenaż
+      nadmiaru wody z ziemi, nie są głównym mechanizmem nawadniania).
+
+  - id: drainage_hole_count
+    name: "Liczba otworów drenażowych"
+    value: 8
+    unit: count
+    tolerance: 0
+    description: Liczba otworów rozmieszczonych równomiernie na okręgu drainage_hole_circle_diameter.
+
+  - id: drainage_hole_circle_diameter
+    name: "Średnica okręgu rozmieszczenia otworów drenażowych"
+    value: 90.0
+    unit: mm
+    tolerance: 0.5
+    description: >
+      Średnica okręgu, na którym leżą środki otworów drenażowych w dnie
+      wkładu — dobrana tak, by nie kolidować ani z rdzeniem kapilarnym w
+      środku, ani ze ścianką boczną.
+
+  - id: spigot_height
+    name: "Wysokość spódnicy pozycjonującej"
+    value: 8.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Wysokość cienkościennej spódnicy zwisającej pod dnem wkładu, która
+      wchodzi (na wcisk) w gardziel zbiornika i centruje/pozycjonuje
+      wkład — patrz specs/planter/decisions.md.
+
+  - id: fit_clearance
+    name: "Luz pasowania spódnicy w gardzieli zbiornika"
+    value: 0.3
+    unit: mm
+    tolerance: 0.05
+    description: >
+      Promieniowy luz między zewnętrzną średnicą spódnicy a wewnętrzną
+      średnicą gardzieli zbiornika (pasowanie wsuwane, typowe dla FDM).
+
+  # --- Rdzeń kapilarny (perforowana rura) --------------------------------
+  - id: capillary_tube_outer_diameter
+    name: "Średnica zewnętrzna rdzenia kapilarnego"
+    value: 24.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Średnica zewnętrzna centralnej, perforowanej rury łączącej wodę w
+      zbiorniku z ziemią we wkładzie. Rura jest wypełniana ziemią przez
+      użytkownika — to ziemia w rurze faktycznie podciąga wodę
+      (kapilarność ziemi/substratu), nie sam plastik — patrz
+      specs/planter/constraints.md ("Brak gwarancji podciągania wody
+      przez sam plastik").
+
+  - id: capillary_tube_inner_diameter
+    name: "Średnica wewnętrzna rdzenia kapilarnego"
+    value: 18.0
+    unit: mm
+    tolerance: 0.3
+    description: Średnica wewnętrzna (bore) rury kapilarnej — tu użytkownik wsypuje ziemię.
+
+  - id: capillary_tube_soil_protrusion
+    name: "Wysokość wystawania rdzenia w ziemię"
+    value: 60.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Wysokość, na jaką rdzeń kapilarny wystaje ponad dno wkładu (Z=0) w
+      głąb komory na ziemię — tak by korzenie miały łatwy dostęp.
+
+  - id: capillary_tube_slot_width
+    name: "Szerokość szczeliny w ściance rdzenia"
+    value: 2.0
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Szerokość pionowych szczelin wyciętych w ściance rury kapilarnej na
+      całej jej długości — pozwalają ziemi w rurze mieć bezpośredni
+      kontakt z wodą/powietrzem na zewnątrz rury.
+
+  - id: capillary_tube_slot_count
+    name: "Liczba szczelin w rdzeniu kapilarnym"
+    value: 6
+    unit: count
+    tolerance: 0
+    description: >
+      Liczba pionowych szczelin rozmieszczonych równomiernie wokół
+      obwodu rury (między nimi zostają żebra nośne).
+
+  - id: capillary_tube_reservoir_clearance
+    name: "Prześwit dna rdzenia nad dnem zbiornika"
+    value: 3.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Odstęp między dolnym końcem rdzenia kapilarnego a wewnętrznym dnem
+      zbiornika — rdzeń sięga blisko dna (żeby działać nawet przy niskim
+      poziomie wody), ale go nie dotyka (nie blokuje przepływu wody pod
+      spodem).
+
+  # --- Zbiornik ("zbiornik") --------------------------------------------
+  - id: reservoir_mouth_inner_diameter
+    name: "Wewnętrzna średnica gardzieli/komory zbiornika"
+    value: 100.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Wewnętrzna średnica zbiornika, stała na całej głębokości
+      (reservoir_cavity_depth) — górna część tej samej komory pełni
+      funkcję gardzieli przyjmującej spódnicę wkładu.
+
+  - id: reservoir_wall_thickness
+    name: "Grubość ścianki zbiornika"
+    value: 3.0
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Grubość ścianki i dna zbiornika (ta sama wartość dla obu — dno nie
+      wymaga dodatkowego pogrubienia jak we wkładzie, bo nie mocuje
+      żadnych elementów).
+
+  - id: reservoir_cavity_depth
+    name: "Głębokość komory na wodę"
+    value: 40.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Głębokość wewnętrznej komory zbiornika, licząc od górnej krawędzi
+      (Z=0, ta sama płaszczyzna co dolna krawędź wkładu) do wewnętrznego
+      dna.
+
+  - id: reservoir_foot_height
+    name: "Wysokość nóżek zbiornika"
+    value: 4.0
+    unit: mm
+    tolerance: 0.2
+    description: Wysokość nóżek pod dnem zbiornika (stabilność, cyrkulacja powietrza).
+
+  - id: reservoir_foot_diameter
+    name: "Średnica nóżek zbiornika"
+    value: 10.0
+    unit: mm
+    tolerance: 0.3
+    description: Średnica każdej z nóżek pod dnem zbiornika.
+
+  - id: reservoir_foot_count
+    name: "Liczba nóżek zbiornika"
+    value: 3
+    unit: count
+    tolerance: 0
+    description: Liczba nóżek rozmieszczonych równomiernie pod dnem zbiornika.
+
+  - id: fill_spout_outer_diameter
+    name: "Średnica zewnętrzna dziubka do nalewania"
+    value: 10.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Średnica zewnętrzna pionowej rurki do nalewania wody bez zdejmowania
+      wkładu, dospawanej do zewnętrznej ścianki zbiornika.
+
+  - id: fill_spout_inner_diameter
+    name: "Średnica wewnętrzna dziubka do nalewania"
+    value: 6.0
+    unit: mm
+    tolerance: 0.2
+    description: Średnica wewnętrzna (bore) dziubka — kanał, którym leci woda.
+
+  - id: fill_spout_top_protrusion
+    name: "Wystawanie dziubka ponad krawędź zbiornika"
+    value: 15.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Wysokość, na jaką dziubek wystaje ponad płaszczyznę Z=0 (górna
+      krawędź zbiornika/dolna krawędź wkładu) — musi być dostępny do
+      nalewania mimo rozszerzającej się ścianki wkładu powyżej, patrz
+      wyprowadzenie marginesu w specs/planter/decisions.md.
+
+  - id: fill_spout_bottom_clearance
+    name: "Prześwit dna dziubka nad dnem zbiornika"
+    value: 3.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Odstęp między dolnym końcem kanału dziubka a wewnętrznym dnem
+      zbiornika — woda dolewana dociera nisko, bez chlupania, ale kanał
+      nie blokuje dna.
+
+  - id: overflow_hole_diameter
+    name: "Średnica otworu przelewowego"
+    value: 5.0
+    unit: mm
+    tolerance: 0.2
+    description: >
+      Średnica poziomego otworu w ściance zbiornika, wyznaczającego
+      maksymalny poziom wody i odprowadzającego nadmiar na zewnątrz.
+
+  - id: overflow_hole_height_from_floor
+    name: "Wysokość otworu przelewowego nad dnem zbiornika"
+    value: 28.0
+    unit: mm
+    tolerance: 0.3
+    description: >
+      Wysokość środka otworu przelewowego mierzona od wewnętrznego dna
+      zbiornika — ustala maksymalny poziom wody (musi zostawiać zapas do
+      krawędzi i nie kolidować ze spódnicą wkładu, patrz decisions.md).
+
+  - id: material_density
+    name: "Gęstość materiału (opcjonalna, do obliczenia masy)"
+    value: 1.24e-6
+    unit: kg/mm3
+    tolerance: 0
+    description: Domyślna gęstość materiału (PLA) używana wyłącznie do obliczenia masy.
+
+  # --- Wzór ścianki zewnętrznej (v1: "premium fluted", wymienny) --------
+  - id: pattern_flute_count
+    name: "Liczba żłobień wzoru ścianki"
+    value: 24
+    unit: count
+    tolerance: 0
+    description: >
+      Liczba pionowych, płytkich żłobień wyciętych w zewnętrznej ściance
+      wkładu (jedyny element geometrii, który ma się zmieniać między
+      wariantami serii — patrz specs/planter/decisions.md "Architektura
+      wymiennego wzoru").
+
+  - id: pattern_flute_depth
+    name: "Głębokość żłobień wzoru ścianki"
+    value: 1.5
+    unit: mm
+    tolerance: 0.1
+    description: >
+      Głębokość każdego żłobienia — ściśle mniejsza niż
+      insert_wall_thickness (zostawia >= 0.5mm ścianki na dnie żłobienia,
+      sprawdzane w check_engineering_preconditions()), na tyle głęboka,
+      żeby wzór był wyraźnie widoczny/wyczuwalny na wydruku.
+
+  - id: pattern_flute_width_deg
+    name: "Szerokość kątowa żłobienia wzoru ścianki"
+    value: 6.0
+    unit: deg
+    tolerance: 0.5
+    description: >
+      Szerokość kątowa (w stopniach, wokół osi Z) pojedynczego narzędzia
+      tnącego żłobienie — musi być mniejsza niż 360/pattern_flute_count,
+      żeby sąsiednie żłobienia się nie stykały.
+
+  - id: pattern_flute_end_margin
+    name: "Margines żłobień od góry i dołu wkładu"
+    value: 5.0
+    unit: mm
+    tolerance: 0.5
+    description: >
+      Odstęp, na jaki żłobienia NIE sięgają do górnej krawędzi (żeby nie
+      kolidować z zaokrągleniem top_rim_fillet_radius — nieregularna,
+      poszarpana krawędź czołowa uniemożliwia fillet, zweryfikowane
+      bezpośrednio budową) ani do dolnej krawędzi wkładu — zostawia gładki
+      pasek na obu końcach.
