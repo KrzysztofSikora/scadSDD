@@ -2,7 +2,7 @@
   "status": "passed",
   "spec_version": "1.0.0",
   "model_id": "self-watering-planter-001",
-  "generated_at": "2026-09-02T21:02:18.509097+00:00",
+  "generated_at": "2026-10-03T22:46:41.474409+00:00",
   "parts": {
     "insert": {
       "model": {

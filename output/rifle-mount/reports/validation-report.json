@@ -2,20 +2,20 @@
   "status": "passed",
   "spec_version": "3.0.0",
   "model_id": "magnetic-rifle-mount-001",
-  "generated_at": "2026-08-25T21:32:45.611591+00:00",
+  "generated_at": "2026-10-03T22:46:33.778309+00:00",
   "parts": {
     "base": {
       "model": {
         "solid_count": 1,
         "is_valid": true,
-        "volume_mm3": 38798.53600974834,
-        "surface_area_mm2": 20649.89756569955,
+        "volume_mm3": 38798.524902961784,
+        "surface_area_mm2": 20649.893465761503,
         "bounding_box_mm": {
           "x": 72.0,
           "y": 72.0,
           "z": 49.0000001
         },
-        "mass_kg": 0.10475604722632052
+        "mass_kg": 0.10475601723799682
       },
       "features": {
         "magnet_count": 2,
@@ -44,14 +44,14 @@
       "model": {
         "solid_count": 1,
         "is_valid": true,
-        "volume_mm3": 90718.81167813145,
-        "surface_area_mm2": 24185.72764158873,
+        "volume_mm3": 90718.80957008165,
+        "surface_area_mm2": 24185.72741518217,
         "bounding_box_mm": {
           "x": 48.00000020000001,
-          "y": 40.00000021973591,
+          "y": 40.00000020000001,
           "z": 165.5000001
         },
-        "mass_kg": 0.2449407915309549
+        "mass_kg": 0.24494078583922044
       },
       "features": {
         "rod_threaded_length_mm": 112.0,
@@ -90,7 +90,7 @@
       "id": "base_volume_positive",
       "description": "Bry\u0142a 'base' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
       "expected": "> 0",
-      "actual": 38798.53600974834,
+      "actual": 38798.524902961784,
       "tolerance": null,
       "status": "passed",
       "message": ""
@@ -117,7 +117,7 @@
       "id": "arm_volume_positive",
       "description": "Bry\u0142a 'arm' ma dodatni\u0105 obj\u0119to\u015b\u0107.",
       "expected": "> 0",
-      "actual": 90718.81167813145,
+      "actual": 90718.80957008165,
       "tolerance": null,
       "status": "passed",
       "message": ""

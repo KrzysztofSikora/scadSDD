@@ -2,7 +2,7 @@
   "status": "passed",
   "spec_version": "1.0.0",
   "model_id": "bracket-001",
-  "generated_at": "2026-08-25T21:04:37.994374+00:00",
+  "generated_at": "2026-10-03T22:46:06.961469+00:00",
   "model": {
     "solid_count": 1,
     "is_valid": true,
